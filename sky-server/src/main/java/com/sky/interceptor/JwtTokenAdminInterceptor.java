@@ -49,6 +49,8 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
             log.info("当前员工id：{}", empId);
+
+            //把id存到threadlocal里面，这样在coller，service层就可以共享id这个数据了
             BaseContext.setCurrentId(empId);
             //3、通过，放行
             return true;
