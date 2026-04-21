@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    password: ${sky.redis.password}
+    database: ${sky.redis.database}
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.sky.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: info
+        controller: info
+
+sky:
+  # 1. 数据库和 Redis 的真实变量值（必须缩进在 sky 下，占位符才能生效）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: sky_take_out
+    username: root
+    password: 1234
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+
+  # 2. JWT 配置（保持原样）
+  jwt:
+    admin-secret-key: itcast
+    admin-ttl: 7200000
+    admin-token-name: token
+    user-secret-key: itheima
+    user-ttl: 7200000
+    user-token-name: authentication
+
+  # 3. 阿里云配置（你已经填好了）
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5tMr9nV2F6SmeFT55wmK
+    access-key-secret: Faj2o4INrW3fkDhhi5gVIV2DtOz5mc
+    bucket-name: ive-won
+
+  # 4. 微信和店铺配置（打破循环）
+  wechat:
+    appid: wx1234567890abcdef
+    secret: 1234567890abcdef1234567890abcdef
+    mchid: 1234567890
+    mchSerialNo: 1234567890ABCDEF1234567890ABCDEF
+    privateKeyFilePath: F:/Code/Java/waimai/apiclient_key.pem
+    apiV3Key: 1234567890abcdef1234567890abcdef
+    weChatPayCertFilePath: F:/Code/Java/waimai/apiclient_cert.pem
+    notifyUrl: http://localhost:8080/notify
+    refundNotifyUrl: http://localhost:8080/refund/notify
+  shop:
+    address: "北京市海淀区" # 👈 这里改掉
+  baidu:
+    ak: "dummy_ak"       # 👈 这里改掉
