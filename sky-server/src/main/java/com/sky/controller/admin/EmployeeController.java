@@ -81,19 +81,10 @@ public class EmployeeController {
      * @param employeeDTO
      * @return
      */
-    /*@PostMapping
-    @ApiOperation("新增员工")
-    public Result save(@RequestBody EmployeeDTO employeeDTO) {
-        System.out.println("当前线程id:"+Thread.currentThread().getId());
-        log.info("新增员工:{}",employeeDTO);
-        employeeService.save(employeeDTO);
-        return Result.success();
-    }*/
-
-
     @PostMapping
     @ApiOperation("新增员工")
     public Result save(@RequestBody EmployeeDTO employeeDTO){
+        System.out.println("当前线程id:"+Thread.currentThread().getId());
         log.info("新增员工：{}",employeeDTO);
         employeeService.save(employeeDTO);
         return Result.success();
@@ -104,13 +95,21 @@ public class EmployeeController {
      * @param employeePageQueryDTO
      * @return
      */
-    @GetMapping("/page")
+    /*@GetMapping("/page")
     @ApiOperation("员工分页查询")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
         System.out.println("当前线程id:"+Thread.currentThread().getId());
         log.info("员工分页查询：参数为：{}",employeePageQueryDTO);
         PageResult pageResult =employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }*/
+
+    @GetMapping("/page")
+    @ApiOperation("员工分页查询")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
+        log.info("分页查询：{}",employeePageQueryDTO);
+        PageResult p =employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(p);
     }
 
     /**

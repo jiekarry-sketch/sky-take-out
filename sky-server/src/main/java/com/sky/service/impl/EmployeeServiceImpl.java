@@ -109,7 +109,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeePageQueryDTO
      * @return
      */
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+    /*public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         // select * from employee limit 0,10
         //开始分页查询
         PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
@@ -118,7 +118,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         long total = page.getTotal();
         List<Employee> records = page.getResult();
         return new PageResult(total,records);
+    }*/
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO){
+        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        Page<Employee> p = employeeMapper.pageQuery(employeePageQueryDTO);
+        long total = p.getTotal();
+        List<Employee> l = p.getResult();
+        return new PageResult(total,l);
     }
+
+
 
     /**
      * 启用禁用员工账号

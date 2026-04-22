@@ -98,16 +98,20 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 扩展Spring MVC框架的消息转换器
+     * 扩展Spring MVC框架的消息转换器(对后端传回前端的数据统一格式化)
      * @param converters
      */
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("扩展消息转换器...");
         //创建一个消息转换器对象
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        //需要为消息转换器设置一个对象转换器，对象转换器可以将Java对象序列化为json数据
+        MappingJackson2HttpMessageConverter converter =new MappingJackson2HttpMessageConverter();
+        //要为消息转换器设置一个对象转换器，
+        //对象转换器可以将Java对象 序列化为Json格式
+        // 它定义了 Long 转 String、日期格式化等规则
         converter.setObjectMapper(new JacksonObjectMapper());
-        //将自己的消息转换器加入容器中
-        converters.add(0,converter);
+
+        // 3. 将我们自定义的转换器添加到集合中
+        // 关键点：一定要加索引 0，表示“插队”到第一位，优先执行！
+        converters.add(0, converter);
     }
 }
