@@ -95,15 +95,6 @@ public class EmployeeController {
      * @param employeePageQueryDTO
      * @return
      */
-    /*@GetMapping("/page")
-    @ApiOperation("员工分页查询")
-    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
-        System.out.println("当前线程id:"+Thread.currentThread().getId());
-        log.info("员工分页查询：参数为：{}",employeePageQueryDTO);
-        PageResult pageResult =employeeService.pageQuery(employeePageQueryDTO);
-        return Result.success(pageResult);
-    }*/
-
     @GetMapping("/page")
     @ApiOperation("员工分页查询")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
@@ -132,12 +123,13 @@ public class EmployeeController {
      * @param id
      * @return
      */
+
     @GetMapping("/{id}")
     @ApiOperation(("根据id查询员工信息"))
-    public Result<Employee> getById(@PathVariable Long id) {
-        log.info("根据id查询员工信息");
-        Employee employee = employeeService.getById(id);
-        return Result.success(employee);
+    public Result<Employee> getById(@PathVariable("id") Long id){
+        log.info("根据id查询员工信息,id = {}",id);
+        Employee e = employeeService.getById(id);
+        return Result.success(e);
     }
 
     /**

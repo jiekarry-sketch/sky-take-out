@@ -134,15 +134,15 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id
      */
     public void startOrStop(Integer status, Long id) {
-        //update employee set status = ? where id= ?
-        /*Employee employee = new Employee();
-        employee.setStatus(status);
-        employee.setId(id);*/
-        Employee employee = Employee.builder()
-                .status(status)
-                .id(id)
-                .build();
-        employeeMapper.update(employee);
+        //update emp set status =? where id =?
+        /*Employee e = new Employee();
+        e.setStatus(status);
+        e.setId(id);*/
+        Employee e = Employee.builder()
+                        .status(status)
+                        .id(id)
+                        .build();
+        employeeMapper.update(e);
     }
 
     /**
@@ -150,9 +150,11 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id
      */
     public Employee getById(Long id){
-        Employee employee = employeeMapper.getById(id);
-        employee.setPassword("****");//加强安全性
-        return employee;
+        Employee e = employeeMapper.getById(id);
+        if(e!=null){
+            e.setPassword("*****"); // 加强安全性
+        }
+        return e;
     }
 
     /**
