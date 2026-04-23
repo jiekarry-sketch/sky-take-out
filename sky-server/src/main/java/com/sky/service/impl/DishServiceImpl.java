@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.autoconfigure.PageHelperProperties;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
@@ -35,7 +36,7 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishMapper dishMapper;
     @Autowired
-    private Properties pageHelperProperties;
+    private PageHelperProperties pageHelperProperties;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
     @Autowired

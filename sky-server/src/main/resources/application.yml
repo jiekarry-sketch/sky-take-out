@@ -2,16 +2,22 @@ server:
   port: 8080
 
 spring:
-  profiles:
-    active: dev
   main:
     allow-circular-references: true
   datasource:
+    # 指定连接池类型为 Druid
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: ${sky.datasource.driver-class-name}
+    url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${sky.datasource.username}
+    password: ${sky.datasource.password}
     druid:
-      driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+      # Druid 特有扩展配置
+      initial-size: 5
+      max-active: 20
+      min-idle: 5
+      max-wait: 60000
+
   redis:
     host: ${sky.redis.host}
     port: ${sky.redis.port}
@@ -19,11 +25,11 @@ spring:
     database: ${sky.redis.database}
 
 mybatis:
-  #mapper配置文件
+  # mapper配置文件路径
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.sky.entity
   configuration:
-    #开启驼峰命名
+    # 开启驼峰命名
     map-underscore-to-camel-case: true
 
 logging:
@@ -34,38 +40,41 @@ logging:
         service: info
         controller: info
 
+# -------------------------------------------------------------------
+# 自定义配置块（存储真实变量值）
+# -------------------------------------------------------------------
 sky:
-  # 1. 数据库和 Redis 的真实变量值（必须缩进在 sky 下，占位符才能生效）
   datasource:
+    # 这里必须是真实值，不能写占位符本身，否则会导致死循环报错
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
     port: 3306
     database: sky_take_out
     username: root
     password: 1234
+
   redis:
     host: localhost
     port: 6379
     password:
     database: 0
 
-  # 2. JWT 配置（保持原样）
   jwt:
-    admin-secret-key: itcast
+    # 管理端 JWT 配置
+    admin-secret-key: "mySuperSecretKeyForJwtThatIsAtLeast32Chars"
     admin-ttl: 7200000
     admin-token-name: token
-    user-secret-key: itheima
+    # 用户端 JWT 配置
+    user-secret-key: "anotherLongSecretKeyForUserJwtAtLeast32Chars"
     user-ttl: 7200000
     user-token-name: authentication
 
-  # 3. 阿里云配置（你已经填好了）
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: LTAI5tMr9nV2F6SmeFT55wmK
     access-key-secret: Faj2o4INrW3fkDhhi5gVIV2DtOz5mc
     bucket-name: ive-won
 
-  # 4. 微信和店铺配置（打破循环）
   wechat:
     appid: wx1234567890abcdef
     secret: 1234567890abcdef1234567890abcdef
@@ -76,7 +85,20 @@ sky:
     weChatPayCertFilePath: F:/Code/Java/waimai/apiclient_cert.pem
     notifyUrl: http://localhost:8080/notify
     refundNotifyUrl: http://localhost:8080/refund/notify
+
   shop:
-    address: "北京市海淀区" # 👈 这里改掉
+    address: "北京市海淀区"
+
   baidu:
-    ak: "dummy_ak"       # 👈 这里改掉
+    ak: "dummy_ak"
+
+  # Knife4j 4.5.0 (OpenAPI 3) 专用配置
+  knife4j:
+    enable: true
+    openapi:
+      title: "苍穹外卖项目接口文档"
+      description: "基于 Spring Boot 4 + JDK 25 的现代化重构版"
+      group:
+        default:
+          group-name: 管理端接口
+          api-package: com.sky.controller.admin

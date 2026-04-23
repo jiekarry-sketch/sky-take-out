@@ -8,13 +8,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement //开启注解方式的事务管理
+@EnableTransactionManagement
 @Slf4j
 @EnableCaching
-@EnableScheduling //开启定时任务处理
+@EnableScheduling
 public class SkyApplication {
     public static void main(String[] args) {
         SpringApplication.run(SkyApplication.class, args);
-        log.info("server started");
+        // 在 JDK 25 中，建议使用更现代的日志打印方式，不过 log.info 依然是标准
+        log.info("SkyTakeOut Server (Spring Boot 4.0.5 & JDK 25) started successfully.");
     }
 }
