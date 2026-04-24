@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/admin/category")
-@Tag(name="分类相关接口")
+@Tag(name="菜品分类相关接口")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
@@ -35,10 +35,10 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/list")
-    @Operation(summary ="根据类型查询菜品")
-    public Result<List<Category>> list( Integer type) {
-        log.info("根据类型查询菜品");
-        List<Category> list= categoryService.list(type);
+    @Operation(summary = "根据类别查询菜品")
+    public Result<List<Category>> list(Integer type){
+        log.info("根据类别查询菜品");
+        List<Category> list = categoryService.list(type);
         return Result.success(list);
     }
 
@@ -47,10 +47,11 @@ public class CategoryController {
      * @param categoryDTO
      * @return
      */
+
     @PutMapping
-    @Operation(summary ="修改分类")
-    public Result<String> update(@RequestBody CategoryDTO categoryDTO) {
-        log.info("修改菜品分类:{}",categoryDTO);
+    @Operation(summary = "修改菜品分类")
+    public Result update(@RequestBody CategoryDTO categoryDTO){
+        log.info("修改菜品分类：{}",categoryDTO);
         categoryService.update(categoryDTO);
         return Result.success();
     }
@@ -104,8 +105,8 @@ public class CategoryController {
     @DeleteMapping
     @Operation(summary ="根据id删除分类")
     public Result delete(String name,Long id){
-       log.info("删除菜品分类:name:{},id:{}",name,id);
-       categoryService.delete(id);
-       return Result.success();
+        log.info("删除菜品分类:name:{},id:{}",name,id);
+        categoryService.delete(id);
+        return Result.success();
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -159,13 +160,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 编辑员工信息
-     * @param employeeDTO
+     * @param ed
      */
-    public void update(EmployeeDTO employeeDTO){
-        Employee employee = new Employee();
-        BeanUtils.copyProperties(employeeDTO,employee);
-        //employee.setUpdateTime(LocalDateTime.now());
-        //employee.setUpdateUser(BaseContext.getCurrentId());
-        employeeMapper.update(employee);
+    public void update(EmployeeDTO ed){
+        Employee e =new Employee();
+        BeanUtils.copyProperties(ed,e);
+        e.setUpdateTime(LocalDateTime.now());
+        e.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(e);
     }
 }

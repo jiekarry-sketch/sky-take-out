@@ -135,14 +135,14 @@ public class EmployeeController {
 
     /**
      * 编辑员工信息
-     * @param employeeDTO
+     * @param ed
      * @return
      */
     @PutMapping
     @Operation(summary ="编辑员工信息")
-    public Result<String> update(@RequestBody EmployeeDTO employeeDTO) {
-        log.info("编辑员工信息:{}",employeeDTO);
-        employeeService.update(employeeDTO);
+    public Result update(@RequestBody EmployeeDTO ed){
+        log.info("编辑员工信息:{}",ed);
+        employeeService.update(ed);
         return Result.success();
     }
 
