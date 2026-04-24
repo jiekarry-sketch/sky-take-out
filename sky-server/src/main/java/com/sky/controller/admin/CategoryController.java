@@ -65,6 +65,7 @@ public class CategoryController {
     @Operation(summary ="分页查询")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO) {
         log.info("分页查询:参数为{}",categoryPageQueryDTO);
+        //PageResult里面有当前总记录，和当前页的list集合
         PageResult pageresult = categoryService.pageQuery(categoryPageQueryDTO);
         return Result.success(pageresult);
     }
