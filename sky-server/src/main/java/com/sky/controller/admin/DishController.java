@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.github.pagehelper.Page;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
@@ -55,8 +56,8 @@ public class DishController {
      * @return
      */
     @GetMapping("/page")
-    @Operation(summary ="菜品分页查询")
-    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
+    @Operation(summary = "菜品分页查询")
+    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("菜品分页查询，参数为:{}",dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
@@ -67,7 +68,7 @@ public class DishController {
      * @param ids
      * @return
      */
-    @DeleteMapping
+    /*@DeleteMapping
     @Operation(summary ="批量删除菜品")
     public Result delete(@RequestParam List<Long> ids) {
         log.info("根据id批量删除菜品:参数为{}",ids);
@@ -78,6 +79,13 @@ public class DishController {
         //Set keys = redisTemplate.keys("dish_*");
         //redisTemplate.delete(keys);//获取后直接放入一个collection集合keys删除
         cleanCache("dish_*");
+        return Result.success();
+    }*/
+    @DeleteMapping
+    @Operation(summary ="批量删除菜品")
+    public Result delete(@RequestParam List<Long> ids){
+        log.info("批量删除菜品 ids = {}",ids);
+        dishService.batchDelete(ids);
         return Result.success();
     }
 

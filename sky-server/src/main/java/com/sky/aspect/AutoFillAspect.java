@@ -65,7 +65,7 @@ public class AutoFillAspect {
         if(operationType == OperationType.INSERT){ //operationType里面是数据库操作类型insert or update
             //为四个公共字段赋值,通过  **反射**  来赋值
             try {
-                //反射获取 setUpdateTime 方法                                        公共字段自动填充相关常量
+                //反射获取 setUpdateTime 方法                                         公共字段自动填充相关常量
                 Method setCreateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
                 Method setCreateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_USER, Long.class);
                 Method setUpdateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);

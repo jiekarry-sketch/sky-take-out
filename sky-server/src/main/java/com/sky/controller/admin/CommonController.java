@@ -22,8 +22,6 @@ import java.util.UUID;
 @Slf4j
 @RequestMapping("/admin/common")
 @Tag(name="通用接口")
-
-
 public class CommonController {
     @Autowired
     private AliOssUtil aliOssUtil;
@@ -52,3 +50,5 @@ public class CommonController {
         return Result.error(MessageConstant.UPLOAD_FAILED);
     }
 }
+
+

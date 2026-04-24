@@ -63,11 +63,11 @@ sky:
   jwt:
     # 管理端 JWT 配置
     admin-secret-key: "mySuperSecretKeyForJwtThatIsAtLeast32Chars"
-    admin-ttl: 7200000
+    admin-ttl: 6048000000
     admin-token-name: token
     # 用户端 JWT 配置
     user-secret-key: "anotherLongSecretKeyForUserJwtAtLeast32Chars"
-    user-ttl: 7200000
+    user-ttl: 6048000000
     user-token-name: authentication
 
   alioss:

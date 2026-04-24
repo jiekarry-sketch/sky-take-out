@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement
+@EnableTransactionManagement //开启事务管理
 @Slf4j
 @EnableCaching
 @EnableScheduling
