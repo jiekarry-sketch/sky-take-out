@@ -464,3 +464,5 @@
 127.0.0.1 - - [24/Apr/2026:15:15:48 +0800] "GET /api/category/page?page=1&pageSize=10 HTTP/1.1" 200 1649 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
 127.0.0.1 - - [24/Apr/2026:15:15:52 +0800] "PUT /api/category HTTP/1.1" 200 33 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
 127.0.0.1 - - [24/Apr/2026:15:15:52 +0800] "GET /api/category/page?page=1&pageSize=10 HTTP/1.1" 200 1649 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+127.0.0.1 - - [24/Apr/2026:15:49:16 +0800] "GET /api/category/page?page=2&pageSize=10 HTTP/1.1" 200 209 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+127.0.0.1 - - [24/Apr/2026:15:49:17 +0800] "GET /api/category/page?page=1&pageSize=10 HTTP/1.1" 200 1649 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"

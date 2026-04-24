@@ -85,8 +85,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         //设置当前记录创建人id和修改人id
         //TODO后期要动态获取
@@ -95,9 +95,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //这样做是因为新增用户时，的一次请求的所有执行流程在一个线程里
         //从Threadlocal存储空间取出id
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
-
+        //employee.setCreateUser(BaseContext.getCurrentId());
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
 
@@ -110,16 +109,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeePageQueryDTO
      * @return
      */
-    /*public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        // select * from employee limit 0,10
-        //开始分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
 
-        Page<Employee> page= employeeMapper.pageQuery(employeePageQueryDTO);
-        long total = page.getTotal();
-        List<Employee> records = page.getResult();
-        return new PageResult(total,records);
-    }*/
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO){
         PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
         Page<Employee> p = employeeMapper.pageQuery(employeePageQueryDTO);
@@ -127,7 +117,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> l = p.getResult();
         return new PageResult(total,l);
     }
-
 
     /**
      * 启用禁用员工账号
