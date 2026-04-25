@@ -98,7 +98,7 @@ public class DishController {
     @Operation(summary ="根据id查询菜品")
     public Result<DishVO> getById(@PathVariable Long id){
         log.info("根据id查询菜品:{}",id);
-        DishVO dishVO =  dishService.getByIdWithFlavor(id);
+        DishVO dishVO = dishService.getByIdWithFlavor(id);
         return Result.success(dishVO);
     }
 
@@ -108,7 +108,7 @@ public class DishController {
      * @param dishDTO
      * @return
      */
-    @PutMapping
+    /*@PutMapping
     @Operation(summary ="修改菜品")
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品:参数为:{}",dishDTO);
@@ -118,6 +118,14 @@ public class DishController {
         //综合下来看，我们不如统一清理所有缓存数据
         //Set keys = redisTemplate.keys("dish_*");
         //redisTemplate.delete(keys);
+        cleanCache("dish_*");
+        return Result.success();
+    }*/
+    @PutMapping
+    @Operation(summary ="修改菜品")
+    public Result update(@RequestBody DishDTO dishDTO){
+        log.info("修改菜品  {}",dishDTO);
+        dishService.dishUpdayeWithFlavor(dishDTO);
         cleanCache("dish_*");
         return Result.success();
     }

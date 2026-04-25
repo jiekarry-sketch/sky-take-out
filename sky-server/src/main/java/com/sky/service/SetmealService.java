@@ -28,7 +28,7 @@ public interface SetmealService {
      * 批量删除套餐
      * @param ids
      */
-    void deleteBatch(List<Long> ids);
+    void delete(List<Long> ids);
 
     /**
      * 根据id查询套餐
@@ -62,4 +62,5 @@ public interface SetmealService {
      * @return
      */
     List<DishItemVO> getDishItemById(Long id);
+
 }

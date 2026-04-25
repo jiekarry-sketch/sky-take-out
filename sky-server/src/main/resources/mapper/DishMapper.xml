@@ -41,9 +41,9 @@
             <if test="description != null">description=#{description},</if>
             <if test="status != null">status=#{status},</if>
             <if test="updateTime != null">update_time=#{updateTime},</if>
-            <if test="updateUser != null">update_user=#{updateUser}</if>
-        where id = #{id}
+            <if test="updateUser != null">update_user=#{updateUser},</if>
         </set>
+        where id = #{id}
     </update>
 
     <select id="list" resultType="com.sky.entity.Dish">

@@ -142,6 +142,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO
      */
+    @Transactional
     public void dishUpdayeWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);

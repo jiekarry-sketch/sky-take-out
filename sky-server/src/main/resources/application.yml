@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: dev   #记得要创建一个application-dev.yml，把本yml里面的占位符所指的真实值写到dev.yml里面。
   main:
     allow-circular-references: true
   datasource:
@@ -96,7 +96,7 @@ sky:
     enable: true
     openapi:
       title: "苍穹外卖项目接口文档"
-      description: "基于 Spring Boot 4 + JDK 21 的现代化重构版"
+      description: "基于 Spring Boot 4(4.0.5) + JDK 21(21.0.11) 的现代化重构版"
       group:
         default:
           group-name: 管理端接口

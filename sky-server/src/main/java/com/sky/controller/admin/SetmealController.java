@@ -27,14 +27,11 @@ public class SetmealController {
     private RedisTemplate redisTemplate;
     /**
      * 新增套餐
-     * @param setmealDTO
-     * @return
      */
     @PostMapping
-    @Operation(summary ="新增套餐")
-    @CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")
+    @Operation(summary = "新增套餐")
     public Result save(@RequestBody SetmealDTO setmealDTO){
-        log.info("新增套餐:{}",setmealDTO);
+        log.info("新增套餐，{}",setmealDTO);
         setmealService.saveWithDish(setmealDTO);
         return Result.success();
     }
@@ -45,11 +42,11 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/page")
-    @Operation(summary ="套餐分页查询")
+    @Operation(summary = "套餐分页查询")
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
-        log.info("套餐分页查询:{}",setmealPageQueryDTO);
+        log.info("套餐分页查询,{}",setmealPageQueryDTO);
         PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
-        return  Result.success(pageResult);
+        return Result.success(pageResult);
     }
 
     /**
@@ -58,11 +55,10 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping
-    @Operation(summary ="批量删除套餐")
-    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
+    @Operation(summary = "批量删除套餐")
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除套餐，参数为:{}",ids);
-        setmealService.deleteBatch(ids);
+        setmealService.delete(ids);
         return Result.success();
     }
 
