@@ -8,8 +8,8 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
 import com.sky.service.EmployeeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/admin/category")
-@Api(tags="分类相关接口")
+@Tag(name="菜品分类相关接口")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
@@ -35,10 +35,10 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/list")
-    @ApiOperation("根据类型查询菜品")
-    public Result<List<Category>> list( Integer type) {
-        log.info("根据类型查询菜品");
-        List<Category> list= categoryService.list(type);
+    @Operation(summary = "根据类别查询菜品")
+    public Result<List<Category>> list(Integer type){
+        log.info("根据类别查询菜品");
+        List<Category> list = categoryService.list(type);
         return Result.success(list);
     }
 
@@ -47,10 +47,11 @@ public class CategoryController {
      * @param categoryDTO
      * @return
      */
+
     @PutMapping
-    @ApiOperation("修改分类")
-    public Result<String> update(@RequestBody CategoryDTO categoryDTO) {
-        log.info("修改菜品分类:{}",categoryDTO);
+    @Operation(summary = "修改菜品分类")
+    public Result update(@RequestBody CategoryDTO categoryDTO){
+        log.info("修改菜品分类：{}",categoryDTO);
         categoryService.update(categoryDTO);
         return Result.success();
     }
@@ -61,9 +62,10 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/page")
-    @ApiOperation("分页查询")
+    @Operation(summary ="分页查询")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO) {
         log.info("分页查询:参数为{}",categoryPageQueryDTO);
+        //PageResult里面有当前总记录，和当前页的list集合
         PageResult pageresult = categoryService.pageQuery(categoryPageQueryDTO);
         return Result.success(pageresult);
     }
@@ -75,7 +77,7 @@ public class CategoryController {
      * @return
      */
     @PostMapping("/status/{status}")
-    @ApiOperation("启用、禁用分类")
+    @Operation(summary ="启用、禁用分类")
     public Result StartOrStop(@PathVariable("status") Integer status,Long id) {
         log.info("启用禁用:{},{}",status,id);
         categoryService.StartOrStop(status,id);
@@ -88,7 +90,7 @@ public class CategoryController {
      * @return
      */
     @PostMapping
-    @ApiOperation("新增分类")
+    @Operation(summary ="新增分类")
     public Result save(@RequestBody CategoryDTO categoryDTO) {
         log.info("新增分类:{}",categoryDTO);
         categoryService.save(categoryDTO);
@@ -102,10 +104,10 @@ public class CategoryController {
      * @return
      */
     @DeleteMapping
-    @ApiOperation("根据id删除分类")
+    @Operation(summary ="根据id删除分类")
     public Result delete(String name,Long id){
-       log.info("删除菜品分类:name:{},id:{}",name,id);
-       categoryService.delete(id);
-       return Result.success();
+        log.info("删除菜品分类:name:{},id:{}",name,id);
+        categoryService.delete(id);
+        return Result.success();
     }
 }

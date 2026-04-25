@@ -43,12 +43,12 @@ public  class CategoryServiceImpl implements CategoryService {
      * 修改菜品分类
      * @param categoryDTO
      */
-    public void update(CategoryDTO categoryDTO) {
+
+    public void update(CategoryDTO categoryDTO){
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO,category);
         //category.setUpdateTime(LocalDateTime.now());
         //category.setUpdateUser(BaseContext.getCurrentId());
-
         categoryMapper.update(category);
     }
 

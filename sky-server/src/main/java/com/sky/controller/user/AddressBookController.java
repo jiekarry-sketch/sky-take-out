@@ -4,8 +4,8 @@ import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
 import com.sky.result.Result;
 import com.sky.service.AddressBookService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/user/addressBook")
-@Api(tags="C端-地址簿相关接口")
+@Tag(name="C端-地址簿相关接口")
 public class AddressBookController {
     @Autowired
     private AddressBookService addressBookService;
@@ -27,7 +27,7 @@ public class AddressBookController {
      * @return
      */
     @PostMapping
-    @ApiOperation("新增地址")
+    @Operation(summary ="新增地址")
     public Result save(@RequestBody AddressBook addressBook) {
         log.info("新增地址信息:{}",addressBook);
         Long userId = BaseContext.getCurrentId();
@@ -42,7 +42,7 @@ public class AddressBookController {
      * @return
      */
     @GetMapping("/{id}")
-    @ApiOperation("根据id查询地址")
+    @Operation(summary ="根据id查询地址")
     public Result<AddressBook> getById( @PathVariable Long id) {
         log.info("查询id为:{}的地址",id);
         AddressBook addressBook = new AddressBook();
@@ -56,7 +56,7 @@ public class AddressBookController {
      * @return
      */
     @GetMapping("/list")
-    @ApiOperation("查询当前登录用户的所有地址信息")
+    @Operation(summary ="查询当前登录用户的所有地址信息")
     public Result<List<AddressBook>> list(){
         log.info("正在查询当前用户所有地址信息");
         Long userId = BaseContext.getCurrentId();
@@ -69,7 +69,7 @@ public class AddressBookController {
      * @return
      */
     @GetMapping("/default")
-    @ApiOperation("根据用户id查询默认地址")
+    @Operation(summary ="根据用户id查询默认地址")
     public Result<AddressBook> getDefaultAddressBook() {
         log.info("正在查询默认地址...");
         Integer isDefault = 1;
@@ -87,7 +87,7 @@ public class AddressBookController {
      * @return
      */
     @PutMapping("/default")
-    @ApiOperation("设置默认地址")
+    @Operation(summary ="设置默认地址")
     public Result setDefaultAddressBook(@RequestBody AddressBook addressBook) {
         log.info("设置地址:{}为默认地址",addressBook);
         addressBook = addressBookService.getAddressBook(addressBook);
@@ -102,7 +102,7 @@ public class AddressBookController {
      * @return
      */
     @PutMapping
-    @ApiOperation("根据id修改地址")
+    @Operation(summary ="根据id修改地址")
     public Result updateAddressBook(@RequestBody AddressBook addressBook) {
         log.info("正在修改地址id为:{}的地址",addressBook.getId());
         Long userId = BaseContext.getCurrentId();
@@ -117,7 +117,7 @@ public class AddressBookController {
      * @return
      */
     @DeleteMapping
-    @ApiOperation("根据id删除地址")
+    @Operation(summary ="根据id删除地址")
     public Result deleteAddressBook(Long id) {
         log.info("正在删除id为{}的地址",id);
         addressBookService.deleteById(id);

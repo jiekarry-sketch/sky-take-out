@@ -5,8 +5,8 @@ import com.sky.entity.Dish;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController("userDishController")
-@Api(tags="C端-浏览菜品接口")
+@Tag(name="C端-浏览菜品接口")
 @RequestMapping("/user/dish")
 @Slf4j
 public class DishController {
@@ -30,7 +30,7 @@ public class DishController {
      * @param categoryId
      * @return
      */
-    @ApiOperation("根据分类id查询菜品")
+    @Operation(summary ="根据分类id查询菜品")
     @GetMapping("/list")
     public Result<List<DishVO>> getByCategoryId(Long categoryId){
         //添加判断:缓存是否存在{缓存:每个分类做一个缓存}

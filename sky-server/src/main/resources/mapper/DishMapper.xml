@@ -14,22 +14,23 @@
             #{id}
         </foreach>
     </delete>
+
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
-        select d.*,c.name as categoryName from dish d left outer join category c on d.category_id=c.id
+        select d.*,c.name as categoryName from dish d left join category c on d.category_id=c.id
         <where>
             <if test="name !=null and name !=''">
-                and d.name like concat('%',#{name},'%')
+                and d.name like concat('%',#{name},'%')   <!--模糊查询-->
             </if>
-            <if test="categoryId !=null and categoryId !=''">
+            <if test="categoryId !=null">
                 and d.category_id = #{categoryId}
             </if>
-            <if test="status !=null and status!=''">
-                and d.status like =#{status}
+            <if test="status !=null">
+                and d.status = #{status}
             </if>
         </where>
         order by d.create_time desc
-
     </select>
+
     <update id="update">
         update dish
         <set>

@@ -10,11 +10,9 @@ import java.lang.annotation.Target;
 /**
  * 自定义注解：用于表示某个方法需要进行公共字段的自动填充处理
  */
-@Target(ElementType.METHOD)//表示注解只能加在方法上面
+@Target(ElementType.METHOD)//指定注解只能加在方法上面
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AutoFill {
+public @interface AutoFill{
     //数据库操作类型:UPDATE,INSERT
     OperationType value();
-
-
 }

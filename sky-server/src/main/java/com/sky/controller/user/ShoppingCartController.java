@@ -6,8 +6,8 @@ import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.ShoppingCart;
 import com.sky.result.Result;
 import com.sky.service.ShoppingCartService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/shoppingCart")
 @Slf4j
-@Api(tags="C端-购物车相关接口")
+@Tag(name="C端-购物车相关接口")
 public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -28,7 +28,7 @@ public class ShoppingCartController {
      * @return
      */
     @PostMapping("/add")
-    @ApiOperation("添加购物车")
+    @Operation(summary ="添加购物车")
     public Result add(@RequestBody ShoppingCartDTO shoppingCartDTO) {
         log.info("添加购物车商品信息为:{}",shoppingCartDTO);
         shoppingCartService.addShoppingCart(shoppingCartDTO);
@@ -40,7 +40,7 @@ public class ShoppingCartController {
      * @return
      */
     @GetMapping("/list")
-    @ApiOperation("查看购物车")
+    @Operation(summary ="查看购物车")
     public Result<List<ShoppingCart>> list(Long id) {
         id = BaseContext.getCurrentId();
         log.info("用户id:{}正在查看购物车",id);
@@ -49,7 +49,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("/clean")
-    @ApiOperation("清空购物车")
+    @Operation(summary ="清空购物车")
     public Result clean(){
         log.info("正在清空购物车");
         shoppingCartService.cleanShoppingCart();

@@ -3,20 +3,19 @@ package com.sky.controller.user;
 import com.sky.entity.Category;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 @RestController("userCategoryController")
 @Slf4j
-@Api(tags="C端-分类接口")
+@Tag(name="C端-分类接口")
 @RequestMapping("/user/category")
 public class CategoryController {
     @Autowired
@@ -26,7 +25,7 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/list")
-    @ApiOperation("条件查询")
+    @Operation(summary ="条件查询")
     public Result<List<Category>> list(Integer type) {
         log.info("根据类型查询菜品,参数:{}",type);
         List<Category> list = categoryService.list(type);

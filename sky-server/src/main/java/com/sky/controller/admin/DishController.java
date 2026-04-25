@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.github.pagehelper.Page;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
@@ -9,9 +10,8 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import java.util.Set;
 @RestController
 @Slf4j
 @RequestMapping("/admin/dish")
-@Api(tags="菜品相关接口")
+@Tag(name="菜品相关接口")
 public class DishController {
     @Autowired
     private DishService dishService;
@@ -39,7 +39,7 @@ public class DishController {
      * @return
      */
     @PostMapping
-    @ApiOperation("新增菜品")
+    @Operation(summary ="新增菜品")
     public Result<String> save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品:{}",dishDTO);
         dishService.saveWithFlavor(dishDTO);
@@ -56,8 +56,8 @@ public class DishController {
      * @return
      */
     @GetMapping("/page")
-    @ApiOperation("菜品分页查询")
-    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
+    @Operation(summary = "菜品分页查询")
+    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("菜品分页查询，参数为:{}",dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
@@ -68,8 +68,8 @@ public class DishController {
      * @param ids
      * @return
      */
-    @DeleteMapping
-    @ApiOperation("批量删除菜品")
+    /*@DeleteMapping
+    @Operation(summary ="批量删除菜品")
     public Result delete(@RequestParam List<Long> ids) {
         log.info("根据id批量删除菜品:参数为{}",ids);
         dishService.batchDelete(ids);
@@ -80,6 +80,13 @@ public class DishController {
         //redisTemplate.delete(keys);//获取后直接放入一个collection集合keys删除
         cleanCache("dish_*");
         return Result.success();
+    }*/
+    @DeleteMapping
+    @Operation(summary ="批量删除菜品")
+    public Result delete(@RequestParam List<Long> ids){
+        log.info("批量删除菜品 ids = {}",ids);
+        dishService.batchDelete(ids);
+        return Result.success();
     }
 
     /**
@@ -88,7 +95,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/{id}")
-    @ApiOperation("根据id查询菜品")
+    @Operation(summary ="根据id查询菜品")
     public Result<DishVO> getById(@PathVariable Long id){
         log.info("根据id查询菜品:{}",id);
         DishVO dishVO =  dishService.getByIdWithFlavor(id);
@@ -102,7 +109,7 @@ public class DishController {
      * @return
      */
     @PutMapping
-    @ApiOperation("修改菜品")
+    @Operation(summary ="修改菜品")
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品:参数为:{}",dishDTO);
         dishService.dishUpdayeWithFlavor(dishDTO);
@@ -122,7 +129,7 @@ public class DishController {
      * @return
      */
     @PostMapping("/status/{status}")
-    @ApiOperation("菜品起售、停售")
+    @Operation(summary ="菜品起售、停售")
     public Result startOrStop(@PathVariable("status") Integer status,Long id) {
         log.info("菜品待售状态:{}",status,id);
         dishService.startOrStop(status,id);
@@ -137,7 +144,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/list")
-    @ApiOperation("根据分类id查询菜品")
+    @Operation(summary ="根据分类id查询菜品")
     public Result<List<Dish>> getByCategoryId(Long categoryId){
         log.info("根据分类id查询菜品:{}",categoryId);
         List<Dish> list = dishService.list(categoryId);

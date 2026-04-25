@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.autoconfigure.PageHelperProperties;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
@@ -35,7 +36,7 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishMapper dishMapper;
     @Autowired
-    private Properties pageHelperProperties;
+    private PageHelperProperties pageHelperProperties;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
@@ -52,14 +53,15 @@ public class DishServiceImpl implements DishService {
     public void saveWithFlavor(DishDTO dishDTO) {
 
         Dish dish = new Dish();
-        BeanUtils.copyProperties(dishDTO, dish);
+        BeanUtils.copyProperties(dishDTO,dish);
         dish.setStatus(StatusConstant.DISABLE);
         //向菜品表插入一条数据
         dishMapper.insert(dish);
         //获取insert语句生成的主键值，在DishMapper.xml里的Insert方法里通过useGeneratedKeys配置
+        //<insert id="insertBatch" useGeneratedKeys="true" keyProperty="id"> 这样就可以返回id了
         Long dishId = dish.getId();
         //向口味表插入n条数据,取出几何数据
-        List<DishFlavor> flavors = dishDTO.getFlavors();
+        List<DishFlavor> flavors = dishDTO.getFlavors(); //dishDTO里面有一个集合flavors
         if (flavors != null && flavors.size() > 0) {
             //向口味表插入n条数据
             flavors.forEach(dishFlavor -> {
@@ -75,11 +77,10 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishPageQueryDTO
      */
-    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO){
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
-        return new PageResult(page.getTotal(), page.getResult());
-
+        return new PageResult(page.getTotal(),page.getResult());
     }
 
     /**
@@ -115,7 +116,6 @@ public class DishServiceImpl implements DishService {
         //根据菜品id集合删除关联的口味数据
         //delete from dish_flavor where dishId = in (?,?,?)
         dishFlavorMapper.deleteByDishIds(ids);
-
     }
 
     /**

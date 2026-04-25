@@ -17,14 +17,17 @@ import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -73,24 +76,32 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     public void save(EmployeeDTO employeeDTO) {
         System.out.println("当前线程id:"+Thread.currentThread().getId());
-        Employee employee=new Employee();
+        Employee employee = new Employee();
 
-        //对象属性拷贝
-        BeanUtils.copyProperties(employeeDTO,employee);//注意DTO和实体类的属性名要一致
+        //对象属性拷贝(注意DTO和实体类的属性名要一致)
+        BeanUtils.copyProperties(employeeDTO,employee);
         //设置账号的状态,默认正常.1表示正常，0表示锁定
         employee.setStatus(StatusConstant.ENABLE);
-        //设置密码，默认密码123456
+        //设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        //设置当前记录的创建时间和修改时间
+
         //employee.setCreateTime(LocalDateTime.now());
         //employee.setUpdateTime(LocalDateTime.now());
-        //设置当前记录创建人id和修改人id
 
+        //设置当前记录创建人id和修改人id
+        //TODO后期要动态获取
+//        employee.setCreateUser(10L);
+//        employee.setUpdateUser(10L);
+
+        //这样做是因为新增用户时，的一次请求的所有执行流程在一个线程里
+        //从Threadlocal存储空间取出id
         //employee.setCreateUser(BaseContext.getCurrentId());
         //employee.setUpdateUser(BaseContext.getCurrentId());
 
-
         employeeMapper.insert(employee);
+
+        /*System.out.println("当前线程id:"+Thread.currentThread().getId());
+       */
     }
 
     /**
@@ -98,15 +109,13 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeePageQueryDTO
      * @return
      */
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        // select * from employee limit 0,10
-        //开始分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
 
-        Page<Employee> page= employeeMapper.pageQuery(employeePageQueryDTO);
-        long total = page.getTotal();
-        List<Employee> records = page.getResult();
-        return new PageResult(total,records);
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO){
+        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        Page<Employee> p = employeeMapper.pageQuery(employeePageQueryDTO);
+        long total = p.getTotal();
+        List<Employee> l = p.getResult();
+        return new PageResult(total,l);
     }
 
     /**
@@ -115,15 +124,15 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id
      */
     public void startOrStop(Integer status, Long id) {
-        //update employee set status = ? where id= ?
-        /*Employee employee = new Employee();
-        employee.setStatus(status);
-        employee.setId(id);*/
-        Employee employee = Employee.builder()
-                .status(status)
-                .id(id)
-                .build();
-        employeeMapper.update(employee);
+        //update emp set status =? where id =?
+        /*Employee e = new Employee();
+        e.setStatus(status);
+        e.setId(id);*/
+        Employee e = Employee.builder()
+                        .status(status)
+                        .id(id)
+                        .build();
+        employeeMapper.update(e);
     }
 
     /**
@@ -131,20 +140,22 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id
      */
     public Employee getById(Long id){
-        Employee employee = employeeMapper.getById(id);
-        employee.setPassword("****");//加强安全性
-        return employee;
+        Employee e = employeeMapper.getById(id);
+        if(e!=null){
+            e.setPassword("*****"); // 加强安全性
+        }
+        return e;
     }
 
     /**
      * 编辑员工信息
-     * @param employeeDTO
+     * @param ed
      */
-    public void update(EmployeeDTO employeeDTO){
-        Employee employee = new Employee();
-        BeanUtils.copyProperties(employeeDTO,employee);
-        //employee.setUpdateTime(LocalDateTime.now());
-        //employee.setUpdateUser(BaseContext.getCurrentId());
-        employeeMapper.update(employee);
+    public void update(EmployeeDTO ed){
+        Employee e =new Employee();
+        BeanUtils.copyProperties(ed,e);
+        e.setUpdateTime(LocalDateTime.now());
+        e.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(e);
     }
 }

@@ -20,7 +20,6 @@ public interface CategoryMapper {
      * @param type
      * @return
      */
-
     List<Category> list(Integer type);
 
     /**
@@ -53,4 +52,5 @@ public interface CategoryMapper {
      */
     @Delete("delete from category where id=#{id}")
     void delete(Long id);
+
 }

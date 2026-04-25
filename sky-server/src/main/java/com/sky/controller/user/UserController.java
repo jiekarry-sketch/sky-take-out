@@ -9,8 +9,8 @@ import com.sky.service.UserService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.DishVO;
 import com.sky.vo.UserLoginVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/user/user")
-@Api(tags="C端用户相关接口")
+@Tag(name="C端用户相关接口")
 @Slf4j
 public class UserController {
     @Autowired
@@ -32,7 +32,7 @@ public class UserController {
      * @param userLoginDTO
      * @return
      */
-    @ApiOperation("微信登录")
+    @Operation(summary ="微信登录")
     @PostMapping("/login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
         log.info("微信登录，授权码:{}",userLoginDTO.getCode());
