@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev
   main:
     allow-circular-references: true
   datasource:
@@ -41,18 +43,14 @@ logging:
         service: info
         controller: info
 
-# -------------------------------------------------------------------
-# 自定义配置块（存储真实变量值）
-# -------------------------------------------------------------------
 sky:
   datasource:
-    # 这里必须是真实值，不能写占位符本身，否则会导致死循环报错
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    host: localhost
-    port: 3306
-    database: sky_take_out
-    username: root
-    password: ${sky.datasource.password}
+    driver-class-name: ${SKY_DATASOURCE_DRIVER}
+    host: ${SKY_DATASOURCE_HOST}
+    port: ${SKY_DATASOURCE_PORT}
+    database: ${SKY_DATASOURCE_DATABASE}
+    username: ${SKY_DATASOURCE_USERNAME}
+    password: ${SKY_DATASOURCE_PASSWORD}
 
   redis:
     host: localhost
