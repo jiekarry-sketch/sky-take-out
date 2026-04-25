@@ -52,7 +52,7 @@ sky:
     port: 3306
     database: sky_take_out
     username: root
-    password: 1234
+    password: ${sky.datasource.password}
 
   redis:
     host: localhost
@@ -62,19 +62,19 @@ sky:
 
   jwt:
     # 管理端 JWT 配置
-    admin-secret-key: "mySuperSecretKeyForJwtThatIsAtLeast32Chars"
+    admin-secret-key: ${sky.jwt.admin-secret-key}
     admin-ttl: 6048000000
     admin-token-name: token
     # 用户端 JWT 配置
-    user-secret-key: "anotherLongSecretKeyForUserJwtAtLeast32Chars"
+    user-secret-key: ${sky.jwt.user-secret-key}
     user-ttl: 6048000000
     user-token-name: authentication
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: your_access_key_id
-    access-key-secret: your_access_key_secret
-    bucket-name: your_bucket-name
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
 
   wechat:
     appid: wx1234567890abcdef
