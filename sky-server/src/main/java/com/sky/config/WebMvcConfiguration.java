@@ -60,7 +60,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * 用户端接口分组
      */
     @Bean
-    public GroupedOpenApi userApi() {
+    public GroupedOpenApi userApi() { //用于分离接口
         return GroupedOpenApi.builder()
                 .group("用户端接口")
                 .packagesToScan("com.sky.controller.user")
