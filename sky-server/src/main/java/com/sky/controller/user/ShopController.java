@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("userShopController")
+@RestController("userShopController") //给容器创建bean的名字区分，用户和客户端
 @RequestMapping("/user/shop")
 @Slf4j
-@Tag(name="店铺相关接口")
+@Tag(name="店铺营业状态相关接口")
 public class ShopController {
     public static final String KEY = "SHOP_STATUS";
     @Autowired

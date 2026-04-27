@@ -27,6 +27,7 @@ spring:
       password: ${sky.redis.password}
       database: ${sky.redis.database}
 
+
 mybatis:
   # mapper配置文件路径
   mapper-locations: classpath:mapper/*.xml
