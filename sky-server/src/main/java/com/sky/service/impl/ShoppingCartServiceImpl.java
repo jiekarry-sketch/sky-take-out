@@ -53,7 +53,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             Long dishId = shoppingCartDTO.getDishId();
             if(dishId!=null){
                 //本次添加到购物车的是菜品
-                Dish dish = dishMapper.getById(dishId);
+                Dish dish = dishMapper.getById(dishId);//
                 shoppingCart.setName(dish.getName());
                 shoppingCart.setImage(dish.getImage());
                 shoppingCart.setAmount(dish.getPrice());
