@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface ShoppingCartMapper {
     /**
-     * 动态条件查询
+     * 动态条件查询,购物车数据
      * @param shoppingCart
      * @return
      */

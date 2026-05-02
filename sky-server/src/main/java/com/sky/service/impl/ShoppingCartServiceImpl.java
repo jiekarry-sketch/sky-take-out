@@ -38,19 +38,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         //或 select * from shopping_cart where user_id=? and dish_id = xx and dish_flavor
         //使用mybatis动态sql拼接
         ShoppingCart shoppingCart = new ShoppingCart();
-        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
         Long currentId = BaseContext.getCurrentId();
         shoppingCart.setUserId(currentId);
         List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
         //如果已经存在，将数目number+1
         if (shoppingCartList != null && shoppingCartList.size() > 0) {
-            ShoppingCart cart = shoppingCartList.get(0);
-            cart.setNumber(cart.getNumber()+1);//update shopping_cart set number = ? where id = ?
+            ShoppingCart cart = shoppingCartList.get(0); //可能查到多条数据，取第一条。
+            cart.setNumber(cart.getNumber()+1);//update shopping_cart set number = ? where id = ?数量加1
             shoppingCartMapper.updateNumberById(cart);
         }else {
-
             //如果不存在，需要插入一条购物车数据
-
             //判断本次添加到购物车的是菜品还是套餐
             Long dishId = shoppingCartDTO.getDishId();
             if(dishId!=null){
@@ -61,13 +59,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 shoppingCart.setAmount(dish.getPrice());
                 }else{
                 //本次添加到购物车的是套餐
-
                 Long setmealId = shoppingCartDTO.getSetmealId();
                 Setmeal setmeal = setmealMapper.getById(setmealId);
                 shoppingCart.setName(setmeal.getName());
                 shoppingCart.setImage(setmeal.getImage());
                 shoppingCart.setAmount(setmeal.getPrice());
-
             }
             shoppingCart.setNumber(1);
             shoppingCart.setCreateTime(LocalDateTime.now());

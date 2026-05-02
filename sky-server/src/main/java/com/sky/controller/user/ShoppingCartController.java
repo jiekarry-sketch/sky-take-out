@@ -29,11 +29,12 @@ public class ShoppingCartController {
      */
     @PostMapping("/add")
     @Operation(summary ="添加购物车")
-    public Result add(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+    public Result add(@RequestBody ShoppingCartDTO shoppingCartDTO){
         log.info("添加购物车商品信息为:{}",shoppingCartDTO);
         shoppingCartService.addShoppingCart(shoppingCartDTO);
         return Result.success();
     }
+
     /**
      *
      * 查看购物车
