@@ -42,6 +42,7 @@ public class DishController {
             return Result.success(list);
         }
 
+        //查询数据库
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品

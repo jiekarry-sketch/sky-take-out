@@ -76,8 +76,8 @@ sky:
     bucket-name: ${sky.alioss.bucket-name}
 
   wechat:
-    appid: wx1234567890abcdef
-    secret: 1234567890abcdef1234567890abcdef
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
     mchid: 1234567890
     mchSerialNo: 1234567890ABCDEF1234567890ABCDEF
     privateKeyFilePath: F:/Code/Java/waimai/apiclient_key.pem

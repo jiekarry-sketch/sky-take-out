@@ -24,6 +24,12 @@ public class UserServiceImpl implements UserService {
     private WeChatProperties weChatProperties;
     @Autowired
     private UserMapper userMapper;
+
+    /**
+     * TODO,没理解
+     * @param userLoginDTO
+     * @return
+     */
     public User wxLogin(UserLoginDTO userLoginDTO) {
         String openid = getOpenid(userLoginDTO.getCode());
         if(openid==null){
@@ -44,7 +50,6 @@ public class UserServiceImpl implements UserService {
     }
     private String getOpenid(String code){
         //调用微信接口服务，获得当前微信用户的openid
-
         Map<String, String> map = new HashMap<>();
         map.put("appid",weChatProperties.getAppid());
         map.put("secret",weChatProperties.getSecret());

@@ -43,6 +43,7 @@ public class DishController {
     public Result<String> save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品:{}",dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
         //清理受影响的缓存数据，找到对应的key清理
         String key = "dish_"+dishDTO.getCategoryId();
         //redisTemplate.delete(key);
@@ -86,6 +87,10 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除菜品 ids = {}",ids);
         dishService.batchDelete(ids);
+        //删除菜品缓存，dish_
+        cleanCache("dish_*");
+        /*Set keys = redisTemplate.keys("dish_");
+        redisTemplate.delete(keys);*/
         return Result.success();
     }
 
