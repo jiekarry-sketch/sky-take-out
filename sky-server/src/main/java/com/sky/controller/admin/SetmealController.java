@@ -30,6 +30,7 @@ public class SetmealController {
      */
     @PostMapping
     @Operation(summary = "新增套餐")
+    @CacheEvict(cacheNames = "setmaelCache",key = "#setmealDTO.categoryId")
     public Result save(@RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐，{}",setmealDTO);
         setmealService.saveWithDish(setmealDTO);
@@ -56,6 +57,7 @@ public class SetmealController {
      */
     @DeleteMapping
     @Operation(summary = "批量删除套餐")
+    @CacheEvict(cacheNames = "setmaelCache",allEntries = true)
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除套餐，参数为:{}",ids);
         setmealService.delete(ids);
@@ -103,8 +105,4 @@ public class SetmealController {
         setmealService.startOrStop(status,id);
         return Result.success();
     }
-//
-//    private void cleanCache(String pattern){
-//        redisTemplate.delete(pattern);
-//    }
 }

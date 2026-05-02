@@ -41,15 +41,12 @@ public class SetmealController {
     @Operation(summary ="根据分类id查询套餐")
     @Cacheable(cacheNames = "setmealCache",key ="#categoryId")//key: setmealCache::categoryId
     public Result<List<Setmeal>> list(Long categoryId) {
-
         Setmeal setmeal = new Setmeal();
         setmeal.setCategoryId(categoryId);
         setmeal.setStatus(StatusConstant.ENABLE);
-
         List<Setmeal> list = setmealService.list(setmeal);
         return Result.success(list);
     }
-
 
     /**
      * 根据套餐id查询包含的菜品列表
