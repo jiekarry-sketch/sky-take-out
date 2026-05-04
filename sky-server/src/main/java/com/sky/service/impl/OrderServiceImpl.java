@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
             orderDetailList.add(orderDetail);
         }
         orderDetailMapper.insertBatch(orderDetailList);
-        //4.用户下单成功后，情况用户购物车数据
+        //4.用户下单成功后，清空用户购物车数据
         shoppingCartMapper.deleteByUserId(userId);
         //5.封装VO返回结果
         OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
