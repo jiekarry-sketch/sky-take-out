@@ -10,17 +10,18 @@ import jakarta.websocket.server.ServerEndpoint;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * WebSocket服务
+ * WebSocket服务，先建立链接，后就可全双工通信
+ * 当前只是一个组件，需要一个配置类进行注册
  */
 @Component
 @ServerEndpoint("/ws/{sid}")
 public class WebSocketServer {
-
     //存放会话对象
-    private static Map<String, Session> sessionMap = new HashMap();
 
+    private static Map<String, Session> sessionMap = new ConcurrentHashMap<>();
     /**
      * 连接建立成功调用的方法
      */
@@ -32,7 +33,6 @@ public class WebSocketServer {
 
     /**
      * 收到客户端消息后调用的方法
-     *
      * @param message 客户端发送过来的消息
      */
     @OnMessage
@@ -42,7 +42,6 @@ public class WebSocketServer {
 
     /**
      * 连接关闭调用的方法
-     *
      * @param sid
      */
     @OnClose
@@ -53,7 +52,6 @@ public class WebSocketServer {
 
     /**
      * 群发
-     *
      * @param message
      */
     public void sendToAllClient(String message) {

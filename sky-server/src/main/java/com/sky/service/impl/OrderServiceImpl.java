@@ -150,7 +150,6 @@ public class OrderServiceImpl implements OrderService {
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
-
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
@@ -161,7 +160,6 @@ public class OrderServiceImpl implements OrderService {
                 .payStatus(Orders.PAID)
                 .checkoutTime(LocalDateTime.now())
                 .build();
-
         orderMapper.update(orders);
 
         //通过WebSocket向客户端浏览器推送消息
@@ -172,12 +170,10 @@ public class OrderServiceImpl implements OrderService {
         map.put("content", "订单号:"+outTradeNo);
         String jsonString = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(jsonString);
-
     }
 
     /**
      * 查询订单详情
-     *
      * @param id
      * @return
      */
