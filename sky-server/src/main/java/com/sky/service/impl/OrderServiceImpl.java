@@ -116,7 +116,6 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 订单支付
-     *
      * @param ordersPaymentDTO
      * @return
      */
@@ -146,7 +145,6 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 支付成功，修改订单状态
-     *
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
@@ -243,7 +241,6 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 再来一单
-     *
      * @param id
      */
     public void repetition(Long id) {
@@ -479,14 +476,16 @@ public class OrderServiceImpl implements OrderService {
      */
     public void reminder(Long id) {
         //根据id查询订单
-        Orders orderDB = orderMapper.getById(id);
-        if (orderDB == null) {
+        Orders order = orderMapper.getById(id);
+        if(order == null){
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
         Map map = new HashMap();
-        map.put("type",2);
+        map.put("type",2);  //2表示催单
         map.put("orderId",id);
-        map.put("content","客户催单，订单号:{}"+orderDB.getNumber());
+        map.put("content", "客户催单，订单号：" + order.getNumber());
+
+        //通过websocket向客户端实时推送消息。
         String jsonString = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(jsonString);
     }

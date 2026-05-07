@@ -112,15 +112,17 @@ public class OrderController {
     }
 
     /**
-     * TODO
+     * 用户催单TODO
      * @param id
      * @return
      */
     @GetMapping("/reminder/{id}")
-    @Operation(summary ="催单")
+    @Operation(summary ="用户催单")
     public Result reminder(@PathVariable("id") Long id){
         log.info("用户正在催单，订单id为{}...",id);
         orderService.reminder(id);
         return Result.success();
     }
+
+
 }
