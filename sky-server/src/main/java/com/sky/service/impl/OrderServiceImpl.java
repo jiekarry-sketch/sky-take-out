@@ -57,7 +57,6 @@ public class OrderServiceImpl implements OrderService {
     @Value("${sky.baidu.ak}")
     private String ak;
 
-
     /**
      * 用户下单
      * @param ordersSubmitDTO

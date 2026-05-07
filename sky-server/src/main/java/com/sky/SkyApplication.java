@@ -7,11 +7,11 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@Slf4j
 @SpringBootApplication
 @EnableTransactionManagement //开启事务管理
-@Slf4j
 @EnableCaching  //开启缓存
-@EnableScheduling
+@EnableScheduling //spring task 定时任务，开启任务调度
 public class SkyApplication {
     public static void main(String[] args) {
         SpringApplication.run(SkyApplication.class, args);

@@ -46,7 +46,7 @@ public class OrderController {
      * @return
      */
     @PutMapping("/payment")
-    @Operation(summary ="订单支付")                     //订单号
+    @Operation(summary ="订单支付")                     //订单号 orderNumber
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         log.info("订单支付：{}", ordersPaymentDTO);
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
