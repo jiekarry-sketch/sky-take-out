@@ -6,6 +6,7 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -74,11 +75,14 @@ public interface OrderMapper {
     List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime orderTime);
 
     /**
-     * 根据日期区间查询营业额
-     * @param map
+     *动态营业额统计，根据日期区间查询营业额
+     * @param
      * @return
      */
     Double sumAmountByMap(Map map);
+    /*Double sumAmountByMap(@Param("begin") LocalDateTime begin,
+                          @Param("end") LocalDateTime end,
+                          @Param("status") Integer status);*/
 
     Integer countOrdersByMap(Map map);
 
@@ -89,4 +93,7 @@ public interface OrderMapper {
      * @return
      */
     List<GoodsSalesDTO> getSalesTop10(LocalDateTime beginTime, LocalDateTime endTime);
+
+
+
 }

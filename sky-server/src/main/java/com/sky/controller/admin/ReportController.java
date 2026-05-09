@@ -37,12 +37,12 @@ public class ReportController {
      * @return
      */
     @GetMapping("/turnoverStatistics")
-    @Operation(summary ="营业额统计接口")
-    public Result<TurnoverReportVO> turnoverStatistic(
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+    @Operation(summary = "营业额统计接口")
+    public Result<TurnoverReportVO> turnoverStatistic (  //日期 前端请求是eg:2026-05-08这样的
+             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
         log.info("营业额数据统计:日期从{}到{}",begin,end);
-        TurnoverReportVO  turnoverReportVO = reportService.getTurnoverStatistics(begin,end);
+        TurnoverReportVO turnoverReportVO = reportService.getTurnoverStatistics(begin,end);
         return Result.success(turnoverReportVO);
     }
 
@@ -74,9 +74,10 @@ public class ReportController {
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
         log.info("订单统计数据,日期：{}到{}",begin,end);
-        OrderReportVO  orderReportVO = reportService.getOrdersStatistics(begin,end);
-        return   Result.success(orderReportVO);
+        OrderReportVO orderReportVO = reportService.getOrdersStatistics(begin,end);
+        return  Result.success(orderReportVO);
     }
+
 
     /**
      * 查询销量排名前10的商品

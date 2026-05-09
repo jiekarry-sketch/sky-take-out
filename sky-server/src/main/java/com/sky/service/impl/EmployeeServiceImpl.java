@@ -77,19 +77,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void save(EmployeeDTO employeeDTO) {
         System.out.println("当前线程id:"+Thread.currentThread().getId());
         Employee employee = new Employee();
-
         //对象属性拷贝(注意DTO和实体类的属性名要一致)
         BeanUtils.copyProperties(employeeDTO,employee);
         //设置账号的状态,默认正常.1表示正常，0表示锁定
         employee.setStatus(StatusConstant.ENABLE);
-        //设置密码
+        //设置密码,数据库存放的是MD5加密后的password
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 
+        employeeMapper.insert(employee);
         //employee.setCreateTime(LocalDateTime.now());
         //employee.setUpdateTime(LocalDateTime.now());
 
         //设置当前记录创建人id和修改人id
-        //TODO后期要动态获取
 //        employee.setCreateUser(10L);
 //        employee.setUpdateUser(10L);
 
@@ -98,10 +97,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         //employee.setCreateUser(BaseContext.getCurrentId());
         //employee.setUpdateUser(BaseContext.getCurrentId());
 
-        employeeMapper.insert(employee);
-
         /*System.out.println("当前线程id:"+Thread.currentThread().getId());
-       */
+         */
     }
 
     /**
@@ -129,9 +126,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         e.setStatus(status);
         e.setId(id);*/
         Employee e = Employee.builder()
-                        .status(status)
-                        .id(id)
-                        .build();
+                .status(status)
+                .id(id)
+                .build();
         employeeMapper.update(e);
     }
 

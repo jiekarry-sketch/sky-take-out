@@ -40,8 +40,12 @@ public class ShopController {
     @GetMapping("/status")
     @Operation(summary ="查询店铺营业状态")
     public Result<Integer> getStatus(){
-        Integer shopStatus = (Integer)redisTemplate.opsForValue().get(KEY);
-        log.info("查询到店铺营业状态为:{}",shopStatus==1?"营业中":"打烊中");
+        Integer shopStatus = (Integer) redisTemplate.opsForValue().get(KEY);
+        if (shopStatus == null) {
+            shopStatus = 1; // 或 0，根据需求
+            log.warn("店铺状态未设置，使用默认值: {}", shopStatus);
+        }
+        log.info("查询到店铺营业状态为:{}", shopStatus == 1 ? "营业中" : "打烊中");
         return Result.success(shopStatus);
     }
 }

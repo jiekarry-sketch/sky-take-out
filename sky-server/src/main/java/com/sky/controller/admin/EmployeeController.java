@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
@@ -48,15 +49,15 @@ public class EmployeeController {
         Employee employee = employeeService.login(employeeLoginDTO);
 
         //登录成功后，生成jwt令牌
-        Map<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();  //制作“载荷” (Claims)
         claims.put(JwtClaimsConstant.EMP_ID, employee.getId());
         String token = JwtUtil.createJWT(
-                jwtProperties.getAdminSecretKey(),
-                jwtProperties.getAdminTtl(),
+                jwtProperties.getAdminSecretKey(),//密钥
+                jwtProperties.getAdminTtl(),//有效期
                 claims);
 
         EmployeeLoginVO employeeLoginVO = EmployeeLoginVO.builder()
-                .id(employee.getId())
+                .id(employee.getId())                  //链式编程写法，避免写很多set
                 .userName(employee.getUsername())
                 .name(employee.getName())
                 .token(token)
@@ -67,12 +68,11 @@ public class EmployeeController {
 
     /**
      * 退出
-     *
-     * @return
      */
     @PostMapping("/logout")
     @Operation(summary ="员工退出")
     public Result<String> logout() {
+        log.info("员工退出登录，员工id: {}", BaseContext.getCurrentId());
         return Result.success();
     }
 
@@ -83,7 +83,8 @@ public class EmployeeController {
      */
     @PostMapping
     @Operation(summary ="新增员工")
-    public Result save(@RequestBody EmployeeDTO employeeDTO){
+    public Result add(@RequestBody EmployeeDTO employeeDTO){
+        //查看同一个请求（例如新增员工）的整个处理链路（Interceptor → Controller → Service → Mapper）都在同一个线程中执行
         System.out.println("当前线程id:"+Thread.currentThread().getId());
         log.info("新增员工：{}",employeeDTO);
         employeeService.save(employeeDTO);
@@ -110,13 +111,12 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/status/{status}")
-    @Operation(summary ="启用禁用员工账号")
+    @Operation(summary = "启用禁用员工账号")
     public Result startOrStop(@PathVariable("status") Integer status,Long id){
         log.info("启用禁用员工账号: {},{}",status,id);
         employeeService.startOrStop(status,id);
         return Result.success();
     }
-
 
     /**
      * 根据id查询员工信息

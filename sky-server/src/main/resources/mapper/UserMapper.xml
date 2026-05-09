@@ -8,6 +8,7 @@
         values
             (#{openid},#{name},#{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+
     <select id="countByMap" resultType="java.lang.Integer">
         select count(id) from user
         <where>

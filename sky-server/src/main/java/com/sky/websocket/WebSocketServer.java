@@ -27,7 +27,7 @@ public class WebSocketServer {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("sid") String sid) {
-        System.out.println("客户端：" + sid + "建立连接");
+        System.out.println("客户端 ：" + sid + "建立连接");
         sessionMap.put(sid, session);
     }
 

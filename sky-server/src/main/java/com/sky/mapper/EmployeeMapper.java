@@ -26,7 +26,8 @@ public interface EmployeeMapper {
      */
     @Insert("insert into employee (name,username,password,phone,sex,id_number,create_time,update_time,create_user,update_user,status) " +
             "values (#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{createTime},#{updateTime},#{createUser},#{updateUser},#{status})")
-    @AutoFill(value = OperationType.INSERT)
+    @AutoFill(value = OperationType.INSERT) //找切面类 AutoFillAspect
+    //公共字段自动填充。能让你在写代码时，不再需要手动去写那堆重复的 setCreateTime、setUpdateUser 等代码。
     void insert(Employee employee);
 
     /**

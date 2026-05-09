@@ -9,6 +9,7 @@ import com.sky.service.ReportService;
 import com.sky.service.WorkspaceService;
 import com.sky.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
+import net.sf.jsqlparser.statement.select.Join;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -48,49 +51,50 @@ public class ReportServiceImpl implements ReportService {
      */
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
         //当前集合存放从begin到end日期的所有日期
-        List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-        while(!begin.equals(end)){
-            //日期计算，计算指定日期的后一天对应的日期
-            begin = begin.plusDays(1);
-            dateList.add(begin);
+        List<LocalDate> dateList = new ArrayList<LocalDate>();
+        LocalDate current = begin;
+        while (!current.isAfter(end)) {
+            dateList.add(current);
+            current = current.plusDays(1);
         }
-        List<Double> turnoverList = new ArrayList<>();
-        for(LocalDate date:dateList){
-            //查询date日期对应的营业额数据。
-            //营业额:状态为"已完成"的订单金额合计
-            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
-            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
 
+        //营业额集合。
+        List<Double> turnoverList = new ArrayList<Double>();
+        for(LocalDate date : dateList){
+            LocalDateTime beginTime = LocalDateTime.of(date,LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date,LocalTime.MAX);
             // select sum(amount) from orders where order_time > beginTime AND order_time < endTime AND status = 5
-            Map map = new HashMap();
-            map.put("beginTime",beginTime);
-            map.put("endTime",endTime);
+ /*SQL 语句（sumAmountByMap）需要三个不同的变量：beginTime（开始时间）、endTime（结束时间）和 status（订单状态）。
+MyBatis 的 Mapper 接口方法通常只接收一个参数。如果你想一次性把这三个“零散”的变量传给 XML 里的 SQL，你有两种主流选择：
+方案 A：专门写一个 Java 类（DTO/POJO）。方案 B：使用一个 Map。*/
+            Map map =new HashMap();
+            map.put("begin",beginTime);
+            map.put("end",endTime);
             map.put("status", Orders.COMPLETED);
             Double turnover = orderMapper.sumAmountByMap(map);
-            if(turnover == null){
-                turnover = 0.0;
-            }
+            turnover = turnover == null ? 0.0:turnover;//判断turnover是否为空，为空的话就设置为0.0
             turnoverList.add(turnover);
         }
-        return TurnoverReportVO.builder()
-                .dateList(StringUtils.join(dateList,","))
+
+        return TurnoverReportVO
+                .builder()
+                .dateList(StringUtils.join(dateList, ",")) //集合对象取出，用，分割，就成string
                 .turnoverList(StringUtils.join(turnoverList,","))
                 .build();
     }
 
     /**
-     * 统计指定区间内用户数据
+     * 统计指定区间内用户数据,用户统计
      * @param begin
      * @param end
      * @return
      */
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
         List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-        while(!begin.equals(end)){
-            begin = begin.plusDays(1);
-            dateList.add(begin);
+        LocalDate current = begin;
+        while (!current.isAfter(end)) {
+            dateList.add(current);
+            current = current.plusDays(1);
         }
         List<Integer> totalUserList = new ArrayList<>();
         List<Integer> newUserList = new ArrayList<>();
@@ -125,41 +129,45 @@ public class ReportServiceImpl implements ReportService {
      */
     public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
         List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-        while(!begin.equals(end)){
-            begin = begin.plusDays(1);
-            dateList.add(begin);
+        LocalDate current = begin;
+        while(!current.isAfter(end)){
+            dateList.add(current);
+            current = current.plusDays(1);
         }
-        List<Integer> orderCountList = new ArrayList<>();
-        List<Integer> validOrderList = new ArrayList<>();
-        for(LocalDate date:dateList){
-            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+
+        List<Integer> ordrerCountList = new ArrayList<Integer>();
+        List<Integer> validOrderCountList = new ArrayList<Integer>();
+        for(LocalDate date : dateList){//如果 date 是 2026-05-08，那么这行代码执行后得到的就是 2026-05-08T00:00:00
+            LocalDateTime beginTime = LocalDateTime.of(date,LocalTime.MIN);//将一个“纯日期”转换成当天的“起始时间”（即 00:00:00）
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
-            Integer orderCount = getOrderCount(beginTime, endTime, null);
+            //每天订单总数
+            Integer orderCount = getOrderCount(beginTime,endTime,null);
             if(orderCount == null){
                 orderCount = 0;
             }
-            orderCountList.add(orderCount);
-            Integer validOrderCount = getOrderCount(beginTime, endTime, Orders.COMPLETED);
+            ordrerCountList.add(orderCount);
+            //每天有效订单总数
+            Integer validOrderCount = getOrderCount(beginTime,endTime,Orders.COMPLETED);
             if(validOrderCount == null){
                 validOrderCount = 0;
             }
-            validOrderList.add(validOrderCount);
+            validOrderCountList.add(validOrderCount);
         }
         //计算时间区内的订单总数量
-        Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
+        Integer totalOrderCount = ordrerCountList.stream().reduce(Integer::sum).get();
         //计算时间区间内的有效订单数量
-        Integer validOrderCount   = validOrderList.stream().reduce(Integer::sum).get();
+        Integer sumValidOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
         //计算订单完成率
         Double orderCompletionRate = 0.0;
-        if(totalOrderCount !=0) {
-            orderCompletionRate = (validOrderCount.doubleValue() / totalOrderCount);
+        if(totalOrderCount != 0){
+            orderCompletionRate = (sumValidOrderCount.doubleValue()/totalOrderCount.doubleValue());
         }
+
         return OrderReportVO.builder()
                 .dateList(StringUtils.join(dateList,","))
-                .validOrderCountList(StringUtils.join(orderCountList,","))
-                .orderCountList(StringUtils.join(validOrderList,","))
-                .validOrderCount(validOrderCount)
+                .validOrderCountList(StringUtils.join(validOrderCountList,","))
+                .orderCountList(StringUtils.join(ordrerCountList,","))
+                .validOrderCount(sumValidOrderCount)
                 .totalOrderCount(totalOrderCount)
                 .orderCompletionRate(orderCompletionRate)
                 .build();
@@ -191,10 +199,11 @@ public class ReportServiceImpl implements ReportService {
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
         List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime,endTime);
-
+//map映射操作：对流中的每一个 GoodsSalesDTO 对象，调用它的 getName() 方法，
+// 取出菜品的名字。:: 是方法引用，等价于 dto -> dto.getName()。
         List<String> nameList = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
         List<Integer> numberList = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
-
+//collect将流中所有映射后的结果（菜品名字）收集成一个新的 List<String>
         return SalesTop10ReportVO.builder()
                 .nameList(StringUtils.join(nameList,","))
                 .numberList(StringUtils.join(numberList,","))
