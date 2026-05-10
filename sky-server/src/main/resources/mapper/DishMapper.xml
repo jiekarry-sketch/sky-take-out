@@ -56,6 +56,7 @@
         </where>
         order by create_time desc
     </select>
+
     <select id="countByStatus" resultType="java.lang.Integer">
         select count(status) from dish
         <where>

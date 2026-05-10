@@ -216,37 +216,39 @@ MyBatis 的 Mapper 接口方法通常只接收一个参数。如果你想一次�
      */
     public void exportBusinessData(HttpServletResponse response) {
         //1.查询数据库(查询最近30天的数据)，获取营业数据
-        //概览数据:营业额，订单完成率，新增用户数，有效订单，平均客单价
-        LocalDate dateBegin = LocalDate.now().minusDays(30);
-        LocalDate dateEnd = LocalDate.now().minusDays(1);
-        LocalDateTime beginTime = LocalDateTime.of(dateBegin, LocalTime.MIN);
-        LocalDateTime endTime = LocalDateTime.of(dateEnd, LocalTime.MAX);
-        BusinessDataVO businessDataVO = workspaceService.getBusinessData(beginTime, endTime);
+        //概览数据:营业额，订单完成率，新增用户数，有效订单，平均客单价busnessVO
+        LocalDate dateBegin = LocalDate.now().minusDays(30);//30天
+        LocalDate dateEnd = LocalDate.now().minusDays(1);// 昨天
+        LocalDateTime begin = LocalDateTime.of(dateBegin, LocalTime.MIN);// 起始日期的 00:00:00
+        LocalDateTime end = LocalDateTime.of(dateEnd, LocalTime.MAX);  // 结束日期的 23:59:59
+        //查询概览数据
+        BusinessDataVO businessDataVO = workspaceService.getBusinessData(begin, end);
 
-        //2.查询到的数据写入excel文件里(通过POI)
+        //2.查询到的数据写入excel文件里(通过POI)，加载模板文件
         InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
-        //基于模版文件创建一个新的excel文件
-        try {
+
+        try { //基于模板文件创建新的excel
             XSSFWorkbook excel = new XSSFWorkbook(in);
-            //填充数据--时间
-            XSSFSheet sheet = excel.getSheet("Sheet1");
-            sheet.getRow(1).getCell(1).setCellValue("时间:" + dateBegin + "至" + dateEnd);
-            //概览数据：最近30天
+            //填充数据
+            XSSFSheet sheet1 = excel.getSheet("Sheet1");
+            XSSFRow row = sheet1.getRow(1);//获取第二行，根据模板文件
+            row.getCell(1).setCellValue("时间"+dateBegin+"到"+dateEnd);//单元格填充
             //获取第四行
-            XSSFRow row = sheet.getRow(3);
-            row.getCell(2).setCellValue(businessDataVO.getTurnover());
-            row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
-            row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+            XSSFRow row4 = sheet1.getRow(3);
+            row4.getCell(2).setCellValue(businessDataVO.getTurnover());
+            row4.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+            row4.getCell(6).setCellValue(businessDataVO.getNewUsers());
             //获取第五行
-            row = sheet.getRow(4);
-            row.getCell(2).setCellValue(businessDataVO.getValidOrderCount());
-            row.getCell(4).setCellValue(businessDataVO.getUnitPrice());
+            XSSFRow row5 = sheet1.getRow(4);
+            row5.getCell(2).setCellValue(businessDataVO.getValidOrderCount());
+            row5.getCell(4).setCellValue(businessDataVO.getUnitPrice());
+
             //填充明细数据：具体到每一天
             for (int i = 0; i < 30; i++) {
                 LocalDate date = dateBegin.plusDays(i);
-                //查询某一天的营业数据
+                //查询某一天的营业数据,LocalDateTime.of(date, LocalTime.MIN)，date这天的0点0分0秒
                 BusinessDataVO businessData = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
-                XSSFRow row1 = sheet.getRow(7 + i);
+                XSSFRow row1 = sheet1.getRow(7 + i);
                 row1.getCell(1).setCellValue(date.toString());
                 row1.getCell(2).setCellValue(businessData.getTurnover());
                 row1.getCell(3).setCellValue(businessData.getValidOrderCount());
@@ -255,13 +257,19 @@ MyBatis 的 Mapper 接口方法通常只接收一个参数。如果你想一次�
                 row1.getCell(6).setCellValue(businessData.getNewUsers());
             }
             //3.通过输出流将excel文件下载到客户端浏览器
+            // 4. 设置响应头 (必须写在获取流之前)
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment;filename=Report.xlsx");
+
             ServletOutputStream outputStream = response.getOutputStream();
             excel.write(outputStream);
             //关闭资源
             outputStream.close();
             excel.close();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 }

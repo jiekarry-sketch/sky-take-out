@@ -94,8 +94,9 @@ public class ReportController {
         SalesTop10ReportVO salesTop10ReportVO = reportService.getSalesTop10(begin,end);
         return  Result.success(salesTop10ReportVO);
     }
+
     /**
-     * 导出运营数据报表
+     * 导出运营数据报表EXCEL
      * @param response
      * @throws IOException
      */
@@ -104,4 +105,8 @@ public class ReportController {
     public void export(HttpServletResponse response) throws IOException {
         reportService.exportBusinessData(response);
     }
+    /**
+     * 不需要返回值类型，返回的数据是二进制流文件，如用了返回值类型，spring就会转换成json数据显示在前端，乱码
+     * 但是我们要前端弹出下载文件，故不需要转换
+     */
 }
