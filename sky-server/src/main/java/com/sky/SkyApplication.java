@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class SkyApplication {
     public static void main(String[] args) {
         SpringApplication.run(SkyApplication.class, args);
-        // 在 JDK 25 中，建议使用更现代的日志打印方式，不过 log.info 依然是标准
         log.info("SkyTakeOut Server (Spring Boot 4.0.5 & JDK 21) started successfully.");
     }
 }
