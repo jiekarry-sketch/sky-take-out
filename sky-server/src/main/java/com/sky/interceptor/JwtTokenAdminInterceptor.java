@@ -25,8 +25,6 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("当前线程id:" + Thread.currentThread().getId());
-
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }

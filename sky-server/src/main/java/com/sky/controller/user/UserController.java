@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.sky.annotation.RateLimit;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
@@ -7,9 +8,7 @@ import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
 import com.sky.service.UserService;
 import com.sky.utils.JwtUtil;
-import com.sky.vo.DishVO;
 import com.sky.vo.UserLoginVO;
-import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +35,7 @@ public class UserController {
      */
     @Operation(summary ="微信登录")
     @PostMapping("/login")
+    @RateLimit(permitsPerSecond = 10, message = "登录请求过于频繁，请稍后再试")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
         log.info("微信登录，授权码:{}", userLoginDTO.getCode());
         //微信登录

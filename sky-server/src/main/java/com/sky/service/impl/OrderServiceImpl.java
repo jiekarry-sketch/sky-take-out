@@ -16,6 +16,7 @@ import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.HttpClientUtil;
+import com.sky.utils.OrderNumberGenerator;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
@@ -87,7 +88,8 @@ public class OrderServiceImpl implements OrderService {
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
         orders.setStatus(Orders.PENDING_PAYMENT);
-        orders.setNumber(String.valueOf(System.currentTimeMillis()));
+        orders.setNumber(OrderNumberGenerator.nextOrderNumber());
+        orders.setVersion(0);
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(userId);
@@ -151,14 +153,25 @@ public class OrderServiceImpl implements OrderService {
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
-        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
+        // 幂等性校验：若订单已支付，直接返回，防止微信重复回调导致重复处理
+        if (ordersDB == null) {
+            log.warn("支付回调异常：订单号 {} 不存在", outTradeNo);
+            return;
+        }
+        if (ordersDB.getPayStatus().equals(Orders.PAID)) {
+            log.info("订单 {} 已支付，跳过重复回调处理", outTradeNo);
+            return;
+        }
+
+        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间（乐观锁）
         Orders orders = Orders.builder()
                 .id(ordersDB.getId())
                 .status(Orders.TO_BE_CONFIRMED)
                 .payStatus(Orders.PAID)
                 .checkoutTime(LocalDateTime.now())
+                .version(ordersDB.getVersion())
                 .build();
-        orderMapper.update(orders);
+        orderMapper.updateStatus(orders);
 
         //通过WebSocket向客户端浏览器推送消息
         //json格式: type{1:来单提醒,2:客户催单},orderId,content
@@ -232,11 +245,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 根据id取消订单
+     * 根据id取消订单（带乐观锁）
      * @param id
      */
     public void cancelOrder(Long id) {
-        orderMapper.cancelOrder(id);
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.CANCELLED)
+                .version(ordersDB.getVersion())
+                .build();
+        orderMapper.updateStatus(orders);
     }
 
     /**
@@ -306,15 +328,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 接单
+     * 接单（带乐观锁 + 状态校验）
      * @param ordersConfirmDTO
      */
     public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders ordersDB = orderMapper.getById(ordersConfirmDTO.getId());
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
         Orders orders = Orders.builder()
                 .id(ordersConfirmDTO.getId())
                 .status(Orders.CONFIRMED)
+                .version(ordersDB.getVersion())
                 .build();
-        orderMapper.update(orders);
+        orderMapper.updateStatus(orders);
     }
 
     /**
@@ -341,18 +368,19 @@ public class OrderServiceImpl implements OrderService {
                     new BigDecimal(0.01));
             log.info("申请退款：{}", refund);
         }
-        // 拒单需要退款，根据订单id更新订单状态、拒单原因、取消时间
+        // 拒单需要退款，根据订单id更新订单状态、拒单原因、取消时间（乐观锁）
         Orders orders = new Orders();
         orders.setId(ordersDB.getId());
         orders.setStatus(Orders.CANCELLED);
         orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
         orders.setCancelTime(LocalDateTime.now());
+        orders.setVersion(ordersDB.getVersion());
 
-        orderMapper.update(orders);
+        orderMapper.updateStatus(orders);
     }
 
     /**
-     * 商家取消订单
+     * 商家取消订单（带乐观锁）
      * @param ordersCancelDTO
      * @throws Exception
      */
@@ -367,17 +395,18 @@ public class OrderServiceImpl implements OrderService {
                     new BigDecimal(0.01));
             log.info("申请退款：{}", refund);
         }
-        // 管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间
+        // 管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间（乐观锁）
         Orders orders = new Orders();
         orders.setId(ordersCancelDTO.getId());
         orders.setStatus(Orders.CANCELLED);
         orders.setCancelReason(ordersCancelDTO.getCancelReason());
         orders.setCancelTime(LocalDateTime.now());
-        orderMapper.update(orders);
+        orders.setVersion(ordersDB.getVersion());
+        orderMapper.updateStatus(orders);
     }
 
     /**
-     * 派送订单
+     * 派送订单（带乐观锁）
      * @param id
      */
     public void delivery(Long id) {
@@ -388,11 +417,12 @@ public class OrderServiceImpl implements OrderService {
         Orders order = new Orders();
         order.setId(orderDB.getId());
         order.setStatus(Orders.DELIVERY_IN_PROGRESS);
-        orderMapper.update(order);
+        order.setVersion(orderDB.getVersion());
+        orderMapper.updateStatus(order);
     }
 
     /**
-     * 完成订单
+     * 完成订单（带乐观锁）
      * @param id
      */
     public void complete(Long id) {
@@ -404,7 +434,8 @@ public class OrderServiceImpl implements OrderService {
         order.setId(orderDB.getId());
         order.setStatus(Orders.COMPLETED);
         order.setDeliveryTime(LocalDateTime.now());
-        orderMapper.update(order);
+        order.setVersion(orderDB.getVersion());
+        orderMapper.updateStatus(order);
     }
     /**
      * 检查客户的收货地址是否超出配送范围

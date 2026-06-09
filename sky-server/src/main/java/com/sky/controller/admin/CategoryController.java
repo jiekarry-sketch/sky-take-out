@@ -8,8 +8,10 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
 import com.sky.service.EmployeeService;
+import com.sky.annotation.RepeatSubmit;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +52,8 @@ public class CategoryController {
 
     @PutMapping
     @Operation(summary = "修改菜品分类")
-    public Result update(@RequestBody CategoryDTO categoryDTO){
+    @RepeatSubmit(interval = 3, message = "请勿重复提交")
+    public Result update(@Valid @RequestBody CategoryDTO categoryDTO){
         log.info("修改菜品分类：{}",categoryDTO);
         categoryService.update(categoryDTO);
         return Result.success();
@@ -91,7 +94,8 @@ public class CategoryController {
      */
     @PostMapping
     @Operation(summary ="新增分类")
-    public Result save(@RequestBody CategoryDTO categoryDTO) {
+    @RepeatSubmit(interval = 3, message = "请勿重复提交")
+    public Result save(@Valid @RequestBody CategoryDTO categoryDTO) {
         log.info("新增分类:{}",categoryDTO);
         categoryService.save(categoryDTO);
         return Result.success();

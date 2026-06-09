@@ -1,0 +1,25 @@
+/* Element Variables — 零食星球最终配色 */
+
+// Override Element UI variables
+$--color-primary: #FF6B50;
+$--color-warning: #FFB020;
+$--color-success: #28A745;
+$--color-danger: #DC3545;
+$--color-info: #4D8AF0;
+
+$--button-font-weight: 400;
+$--border-color-light: #EEEEEE;
+$--border-color-lighter: #F5F5F5;
+$--table-border: 1px solid #EEEEEE;
+
+$--color-text-primary: #212121;
+$--color-text-regular: #757575;
+$--color-text-placeholder: #BDBDBD;
+$--border-color-base: #E0E0E0;
+$--background-color-base: #FAFAFA;
+
+// Icon font path, required
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+
+// Apply overrided variables in Element UI
+@import '~element-ui/packages/theme-chalk/src/index';

@@ -20,9 +20,9 @@ import com.sky.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 员工登录
@@ -53,12 +55,23 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
-        //密码比对
-        //对前端传过来的明文密码进行md5加密处理
-        password=DigestUtils.md5DigestAsHex(password.getBytes());
-        if (!password.equals(employee.getPassword())) {
-            //密码错误
-            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+        //密码比对（兼容旧MD5密码，自动升级为BCrypt）
+        String storedPassword = employee.getPassword();
+        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$")) {
+            // 新密码格式：BCrypt验证
+            if (!passwordEncoder.matches(password, storedPassword)) {
+                throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+            }
+        } else {
+            // 旧密码格式：MD5验证，验证通过后自动升级为BCrypt
+            String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
+            if (!md5Password.equals(storedPassword)) {
+                throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+            }
+            // 自动将旧MD5密码升级为BCrypt
+            employee.setPassword(passwordEncoder.encode(password));
+            employeeMapper.update(employee);
+            log.info("员工{}的密码已自动从MD5升级为BCrypt", employee.getUsername());
         }
 
         if (employee.getStatus() == StatusConstant.DISABLE) {
@@ -75,30 +88,15 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeeDTO
      */
     public void save(EmployeeDTO employeeDTO) {
-        System.out.println("当前线程id:"+Thread.currentThread().getId());
         Employee employee = new Employee();
         //对象属性拷贝(注意DTO和实体类的属性名要一致)
         BeanUtils.copyProperties(employeeDTO,employee);
         //设置账号的状态,默认正常.1表示正常，0表示锁定
         employee.setStatus(StatusConstant.ENABLE);
-        //设置密码,数据库存放的是MD5加密后的password
-        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+        //设置密码,数据库存放的是BCrypt加密后的password
+        employee.setPassword(passwordEncoder.encode(PasswordConstant.DEFAULT_PASSWORD));
 
         employeeMapper.insert(employee);
-        //employee.setCreateTime(LocalDateTime.now());
-        //employee.setUpdateTime(LocalDateTime.now());
-
-        //设置当前记录创建人id和修改人id
-//        employee.setCreateUser(10L);
-//        employee.setUpdateUser(10L);
-
-        //这样做是因为新增用户时，的一次请求的所有执行流程在一个线程里
-        //从Threadlocal存储空间取出id
-        //employee.setCreateUser(BaseContext.getCurrentId());
-        //employee.setUpdateUser(BaseContext.getCurrentId());
-
-        /*System.out.println("当前线程id:"+Thread.currentThread().getId());
-         */
     }
 
     /**

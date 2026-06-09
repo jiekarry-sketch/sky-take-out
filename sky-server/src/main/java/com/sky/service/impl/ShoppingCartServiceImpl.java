@@ -1,15 +1,17 @@
 package com.sky.service.impl;
 
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.ShoppingCart;
+import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.service.ShoppingCartService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.WeakHashMap;
 
 @Slf4j
 @Service
@@ -33,33 +34,44 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      * @param shoppingCartDTO
      */
     public void addShoppingCart(ShoppingCartDTO shoppingCartDTO) {
-        //判断当前加入购物车的商品是否已经存在:
-        // select * from shopping_cart where user_id =? and setmeal_id=xx
-        //或 select * from shopping_cart where user_id=? and dish_id = xx and dish_flavor
-        //使用mybatis动态sql拼接
+        // 校验商品是否在售
+        Long dishId = shoppingCartDTO.getDishId();
+        Long setmealId = shoppingCartDTO.getSetmealId();
+
+        if (dishId != null) {
+            // 菜品状态校验
+            Dish dish = dishMapper.getById(dishId);
+            if (dish == null || !StatusConstant.ENABLE.equals(dish.getStatus())) {
+                throw new ShoppingCartBusinessException("该菜品已停售，无法添加到购物车");
+            }
+        } else if (setmealId != null) {
+            // 套餐状态校验
+            Setmeal setmeal = setmealMapper.getById(setmealId);
+            if (setmeal == null || !StatusConstant.ENABLE.equals(setmeal.getStatus())) {
+                throw new ShoppingCartBusinessException("该套餐已停售，无法添加到购物车");
+            }
+        }
+
+        //判断当前加入购物车的商品是否已经存在
         ShoppingCart shoppingCart = new ShoppingCart();
-        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
         Long currentId = BaseContext.getCurrentId();
         shoppingCart.setUserId(currentId);
         List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+
         //如果已经存在，将数目number+1
         if (shoppingCartList != null && shoppingCartList.size() > 0) {
-            ShoppingCart cart = shoppingCartList.get(0); //可能查到多条数据，取第一条。
-            cart.setNumber(cart.getNumber()+1);//update shopping_cart set number = ? where id = ?数量加1
+            ShoppingCart cart = shoppingCartList.get(0);
+            cart.setNumber(cart.getNumber() + 1);
             shoppingCartMapper.updateNumberById(cart);
-        }else {
+        } else {
             //如果不存在，需要插入一条购物车数据
-            //判断本次添加到购物车的是菜品还是套餐
-            Long dishId = shoppingCartDTO.getDishId();
-            if(dishId!=null){
-                //本次添加到购物车的是菜品
-                Dish dish = dishMapper.getById(dishId);//
+            if (dishId != null) {
+                Dish dish = dishMapper.getById(dishId);
                 shoppingCart.setName(dish.getName());
                 shoppingCart.setImage(dish.getImage());
                 shoppingCart.setAmount(dish.getPrice());
-                }else{
-                //本次添加到购物车的是套餐
-                Long setmealId = shoppingCartDTO.getSetmealId();
+            } else {
                 Setmeal setmeal = setmealMapper.getById(setmealId);
                 shoppingCart.setName(setmeal.getName());
                 shoppingCart.setImage(setmeal.getImage());

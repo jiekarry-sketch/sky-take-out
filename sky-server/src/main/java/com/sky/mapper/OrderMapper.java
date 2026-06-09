@@ -6,11 +6,8 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -51,11 +48,11 @@ public interface OrderMapper {
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 
     /**
-     * 取消订单,status更新为6
-     * @param id
+     * 带乐观锁的订单状态更新
+     * 用于所有订单状态变更操作（接单、拒单、取消、派送、完成、支付成功）
+     * @param orders
      */
-    @Update("update orders set status = 6  where id = #{id} ")
-    void cancelOrder(Long id);
+    void updateStatus(Orders orders);
 
     /**
      * 根据status统计对应status的订单数量

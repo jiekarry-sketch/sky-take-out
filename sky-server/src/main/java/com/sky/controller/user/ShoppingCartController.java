@@ -1,7 +1,6 @@
 package com.sky.controller.user;
 
 import com.sky.context.BaseContext;
-import com.sky.dto.DishDTO;
 import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.ShoppingCart;
 import com.sky.result.Result;
@@ -9,7 +8,6 @@ import com.sky.service.ShoppingCartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,16 +34,15 @@ public class ShoppingCartController {
     }
 
     /**
-     *
      * 查看购物车
      * @return
      */
     @GetMapping("/list")
     @Operation(summary ="查看购物车")
-    public Result<List<ShoppingCart>> list(Long id) {
-        id = BaseContext.getCurrentId();
-        log.info("用户id:{}正在查看购物车",id);
-        List<ShoppingCart> list = shoppingCartService.listShoppingCart(id);
+    public Result<List<ShoppingCart>> list() {
+        Long userId = BaseContext.getCurrentId();
+        log.info("用户id:{}正在查看购物车", userId);
+        List<ShoppingCart> list = shoppingCartService.listShoppingCart(userId);
         return Result.success(list);
     }
 

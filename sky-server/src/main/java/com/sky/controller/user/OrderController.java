@@ -1,11 +1,14 @@
 package com.sky.controller.user;
 
+import com.sky.annotation.RateLimit;
+import com.sky.annotation.RepeatSubmit;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.Orders;
 import com.sky.exception.OrderBusinessException;
+import jakarta.validation.Valid;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -34,7 +37,9 @@ public class OrderController {
      */
     @PostMapping("/submit")
     @Operation(summary ="用户下单")
-    public Result<OrderSubmitVO> sumbitOrder(@RequestBody OrdersSubmitDTO ordersSubmitDTO){
+    @RepeatSubmit(interval = 5, message = "请勿重复下单")
+    @RateLimit(permitsPerSecond = 5, message = "下单请求过于频繁，请稍后再试")
+    public Result<OrderSubmitVO> sumbitOrder(@Valid @RequestBody OrdersSubmitDTO ordersSubmitDTO){
         log.info("用户下单，参数为:{}",ordersSubmitDTO);
         OrderSubmitVO orderSubmitVO = orderService.sumbitOrder(ordersSubmitDTO);
         return Result.success(orderSubmitVO);
@@ -46,7 +51,8 @@ public class OrderController {
      * @return
      */
     @PutMapping("/payment")
-    @Operation(summary ="订单支付")                     //订单号 orderNumber
+    @Operation(summary ="订单支付")
+    @RepeatSubmit(interval = 5, message = "请勿重复支付")
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         log.info("订单支付：{}", ordersPaymentDTO);
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
@@ -85,6 +91,7 @@ public class OrderController {
 
     @PutMapping("/cancel/{id}")
     @Operation(summary ="取消订单")
+    @RepeatSubmit(interval = 3, message = "请勿重复操作")
     public Result cancelById(@PathVariable("id") Long id){
         log.info("正在取消订单id为{}的订单...",id);
         //先查询当前订单是否完成，如果未完成则可以取消
@@ -105,6 +112,7 @@ public class OrderController {
      */
     @PostMapping("/repetition/{id}")
     @Operation(summary ="再来一单")
+    @RepeatSubmit(interval = 3, message = "请勿重复操作")
     public Result repetition(@PathVariable("id") Long id){
         log.info("用户发起请求：再来一单，对应订单id{}",id);
         orderService.repetition(id);

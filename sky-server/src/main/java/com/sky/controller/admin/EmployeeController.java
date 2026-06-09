@@ -12,9 +12,11 @@ import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import com.sky.annotation.RateLimit;
+import com.sky.annotation.RepeatSubmit;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +45,8 @@ public class EmployeeController {
      */
     @PostMapping("/login")
     @Operation(summary ="员工登录")
-    public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
+    @RateLimit(permitsPerSecond = 5, message = "登录请求过于频繁，请稍后再试")
+    public Result<EmployeeLoginVO> login(@Valid @RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
         Employee employee = employeeService.login(employeeLoginDTO);
@@ -83,9 +86,8 @@ public class EmployeeController {
      */
     @PostMapping
     @Operation(summary ="新增员工")
-    public Result add(@RequestBody EmployeeDTO employeeDTO){
-        //查看同一个请求（例如新增员工）的整个处理链路（Interceptor → Controller → Service → Mapper）都在同一个线程中执行
-        System.out.println("当前线程id:"+Thread.currentThread().getId());
+    @RepeatSubmit(interval = 3, message = "请勿重复提交")
+    public Result add(@Valid @RequestBody EmployeeDTO employeeDTO){
         log.info("新增员工：{}",employeeDTO);
         employeeService.save(employeeDTO);
         return Result.success();

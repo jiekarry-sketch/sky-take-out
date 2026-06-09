@@ -8,6 +8,7 @@ import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,15 +24,14 @@ import java.util.List;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+
     /**
      * 新增套餐
      */
     @PostMapping
     @Operation(summary = "新增套餐")
-    @CacheEvict(cacheNames = "setmaelCache",key = "#setmealDTO.categoryId")
-    public Result save(@RequestBody SetmealDTO setmealDTO){
+    @CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")
+    public Result save(@Valid @RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐，{}",setmealDTO);
         setmealService.saveWithDish(setmealDTO);
         return Result.success();
@@ -57,7 +57,7 @@ public class SetmealController {
      */
     @DeleteMapping
     @Operation(summary = "批量删除套餐")
-    @CacheEvict(cacheNames = "setmaelCache",allEntries = true)
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除套餐，参数为:{}",ids);
         setmealService.delete(ids);
@@ -85,7 +85,7 @@ public class SetmealController {
     @PutMapping
     @Operation(summary ="修改套餐")
     @CacheEvict(cacheNames = "setmealCache",allEntries = true)
-    public Result update(@RequestBody SetmealDTO setmealDTO){
+    public Result update(@Valid @RequestBody SetmealDTO setmealDTO){
         log.info("修改套餐:{}",setmealDTO);
         setmealService.update(setmealDTO);
         return Result.success();

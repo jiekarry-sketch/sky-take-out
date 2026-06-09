@@ -182,6 +182,7 @@ CREATE TABLE `orders` (
   `pack_amount` int DEFAULT NULL COMMENT '打包费',
   `tableware_number` int DEFAULT NULL COMMENT '餐具数量',
   `tableware_status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '餐具数量状态  1按餐量提供  0选择具体数量',
+  `version` int NOT NULL DEFAULT '0' COMMENT '乐观锁版本号',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8_bin COMMENT='订单表';
 
@@ -240,3 +241,29 @@ CREATE TABLE `user` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8_bin COMMENT='用户信息';
+
+-- ==================== 性能优化索引 ====================
+
+-- 订单表索引：用户查询、状态筛选、时间排序、订单号查找
+ALTER TABLE orders ADD INDEX idx_orders_user_id (user_id);
+ALTER TABLE orders ADD INDEX idx_orders_status (status);
+ALTER TABLE orders ADD INDEX idx_orders_order_time (order_time);
+ALTER TABLE orders ADD UNIQUE INDEX idx_orders_number (number);
+
+-- 订单明细表索引：按订单ID查询
+ALTER TABLE order_detail ADD INDEX idx_order_detail_order_id (order_id);
+
+-- 购物车表索引：按用户ID查询
+ALTER TABLE shopping_cart ADD INDEX idx_shopping_cart_user_id (user_id);
+
+-- 地址簿表索引：按用户ID查询
+ALTER TABLE address_book ADD INDEX idx_address_book_user_id (user_id);
+
+-- 菜品表索引：按分类ID查询
+ALTER TABLE dish ADD INDEX idx_dish_category_id (category_id);
+
+-- 菜品口味表索引：按菜品ID查询
+ALTER TABLE dish_flavor ADD INDEX idx_dish_flavor_dish_id (dish_id);
+
+-- 套餐菜品关联表索引：按套餐ID查询
+ALTER TABLE setmeal_dish ADD INDEX idx_setmeal_dish_setmeal_id (setmeal_id);

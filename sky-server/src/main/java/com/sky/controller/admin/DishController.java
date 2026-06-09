@@ -4,7 +4,6 @@ import com.github.pagehelper.Page;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
@@ -12,14 +11,15 @@ import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 菜品相关接口
@@ -40,13 +40,12 @@ public class DishController {
      */
     @PostMapping
     @Operation(summary ="新增菜品")
-    public Result<String> save(@RequestBody DishDTO dishDTO) {
+    public Result<String> save(@Valid @RequestBody DishDTO dishDTO) {
         log.info("新增菜品:{}",dishDTO);
         dishService.saveWithFlavor(dishDTO);
 
         //清理受影响的缓存数据，找到对应的key清理
         String key = "dish_"+dishDTO.getCategoryId();
-        //redisTemplate.delete(key);
         cleanCache(key);
         return Result.success();
     }
@@ -69,28 +68,12 @@ public class DishController {
      * @param ids
      * @return
      */
-    /*@DeleteMapping
-    @Operation(summary ="批量删除菜品")
-    public Result delete(@RequestParam List<Long> ids) {
-        log.info("根据id批量删除菜品:参数为{}",ids);
-        dishService.batchDelete(ids);
-        //这里可能会影响多个key;我们采用简单的方法:删除菜品后，把所有的菜品缓存都删掉
-        //不能直接redisTemplate.delete("dish_*"),因为删除的时候是不能识别通配符的
-        // 先获取所有以dish_开头的key
-        //Set keys = redisTemplate.keys("dish_*");
-        //redisTemplate.delete(keys);//获取后直接放入一个collection集合keys删除
-        cleanCache("dish_*");
-        return Result.success();
-    }*/
     @DeleteMapping
     @Operation(summary ="批量删除菜品")
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除菜品 ids = {}",ids);
         dishService.batchDelete(ids);
-        //删除菜品缓存，dish_
         cleanCache("dish_*");
-        /*Set keys = redisTemplate.keys("dish_");
-        redisTemplate.delete(keys);*/
         return Result.success();
     }
 
@@ -108,28 +91,14 @@ public class DishController {
     }
 
     /**
-     *
      * 修改菜品
      * @param dishDTO
      * @return
      */
-    /*@PutMapping
-    @Operation(summary ="修改菜品")
-    public Result update(@RequestBody DishDTO dishDTO) {
-        log.info("修改菜品:参数为:{}",dishDTO);
-        dishService.dishUpdayeWithFlavor(dishDTO);
-        //修改操作包含多个对象:名称、价格，这些影响较小
-        //修改分类的话就相当于新增，所以得把这个分类的也得清除了，相当于涉及到的分类我们都要清缓存
-        //综合下来看，我们不如统一清理所有缓存数据
-        //Set keys = redisTemplate.keys("dish_*");
-        //redisTemplate.delete(keys);
-        cleanCache("dish_*");
-        return Result.success();
-    }*/
     @PutMapping
     @Operation(summary ="修改菜品")
-    public Result update(@RequestBody DishDTO dishDTO){
-        log.info("修改菜品  {}",dishDTO);
+    public Result update(@Valid @RequestBody DishDTO dishDTO){
+        log.info("修改菜品:{}",dishDTO);
         dishService.dishUpdayeWithFlavor(dishDTO);
         cleanCache("dish_*");
         return Result.success();
@@ -144,10 +113,8 @@ public class DishController {
     @PostMapping("/status/{status}")
     @Operation(summary ="菜品起售、停售")
     public Result startOrStop(@PathVariable("status") Integer status,Long id) {
-        log.info("菜品待售状态:{}",status,id);
+        log.info("菜品起售停售:status={},id={}",status,id);
         dishService.startOrStop(status,id);
-        //Set keys = redisTemplate.keys("dish_*");
-        //redisTemplate.delete(keys);
         cleanCache("dish_*");
         return Result.success();
     }
@@ -165,12 +132,20 @@ public class DishController {
     }
 
     /**
-     *
-     * 清理缓存数据
+     * 清理缓存数据（使用SCAN替代KEYS，避免阻塞Redis）
      * @param pattern
      */
     private void cleanCache(String pattern){
-        Set keys = redisTemplate.keys(pattern);
-        redisTemplate.delete(keys);
+        List<Object> keys = new ArrayList<>();
+        ScanOptions options = ScanOptions.scanOptions().match(pattern).count(100).build();
+        try (var cursor = redisTemplate.scan(options)) {
+            while (cursor.hasNext()) {
+                keys.add(cursor.next());
+            }
+        }
+        if (!keys.isEmpty()) {
+            redisTemplate.delete(keys);
+            log.debug("清理缓存: pattern={}, 命中{}个key", pattern, keys.size());
+        }
     }
 }

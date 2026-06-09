@@ -7,6 +7,12 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * 启动类
+ * 启动后端后
+ * 前端访问 http://localhost
+ */
+
 @Slf4j
 @SpringBootApplication
 @EnableTransactionManagement //开启事务管理

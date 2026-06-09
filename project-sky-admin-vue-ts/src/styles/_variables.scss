@@ -1,0 +1,97 @@
+/* ============================================
+   零食星球 · 前端配色方案（最终版）
+   ============================================ */
+
+// 品牌色（珊瑚橙）
+$mine: #FF6B50;
+$primary-hover: #E95A42;
+$primary-light: #FFF2EF;
+$primary-active-bg: rgba(255, 107, 80, 0.15);
+
+// 宇宙背景深紫（登录页/404）
+$space-dark: #120024;
+$space-mid: #220044;
+$space-light: #3B0A68;
+
+// 灰度系统
+$gray-50: #FAFAFA;
+$gray-100: #F5F5F5;
+$gray-200: #EEEEEE;
+$gray-300: #E0E0E0;
+$gray-400: #BDBDBD;
+$gray-500: #9E9E9E;
+$gray-600: #757575;
+$gray-700: #616161;
+$gray-800: #424242;
+$gray-900: #212121;
+
+// 兼容旧变量名
+$gray-1: $gray-900;
+$gray-2: $gray-600;
+$gray-3: $gray-400;
+$gray-4: $gray-300;
+$gray-5: $gray-100;
+$gray-6: $gray-200;
+$bgColor: $gray-50;
+$loginBg: $primary-light;
+$blue: #4D8AF0;
+$green: #28A745;
+$yellow: #FFB020;
+$pink: #DC3545;
+$block: #000;
+$white: #fff;
+
+// 状态色
+$success: #28A745;
+$warning: #FFB020;
+$error: #DC3545;
+$info: #4D8AF0;
+
+// 阴影
+$shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+// Sidebar
+$sideBarWidth: 190px;
+$subMenuBg: #1E1A2A;
+$subMenuHover: #2A2440;
+$subMenuActiveText: #ffffff;
+$menuBg: #1E1A2A;
+$menuText: rgba(255, 255, 255, 0.5);
+$menuActiveText: $mine;
+
+// Login page
+$lightGray: #080808;
+$darkGray: #889aa4;
+$loginCursorColor: #080808;
+
+// The :export directive is the magic sauce for webpack
+:export {
+  menuBg: $menuBg;
+  menuText: $menuText;
+  menuActiveText: $menuActiveText;
+}
+
+.avatar-uploader .el-upload {
+  border-radius: 4px !important;
+  background: #FCFCFC;
+}
+.avatar-uploader .avatar-uploader-icon {
+  background: #FCFCFC;
+}
+.avatar-uploader .el-icon-plus:before {
+  content: '上传图片' !important;
+  font-size: 12px;
+  color: #000;
+}
+
+// 弹框样式处理
+.el-dialog {
+  border-radius: 16px;
+}
+.el-dialog__header {
+  background: $gray-50;
+  border-radius: 16px 16px 0 0;
+  border: none;
+}
